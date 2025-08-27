@@ -19,10 +19,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    endereco: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
     tipoUser: {
       type: DataTypes.STRING,
       allowNull: true,

@@ -2,34 +2,40 @@ const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const { User } = require("../models"); // ajusta conforme sua estrutura Sequelize
 
-passport.use(new GoogleStrategy(
-  {
-    clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "/api/auth/google/callback"
-  },
-  async (accessToken, refreshToken, profile, done) => {
-    try {
-      // Tenta encontrar um usuário com o Google ID
-      let user = await User.findOne({ where: { googleId: profile.id } });
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: "/api/auth/google/callback",
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      try {
+        // Converte profile.id para string
+        const googleIdStr = profile.id.toString();
 
-      // SE O USUÁRIO NÃO EXISTE, CRIE UM NOVO
-      if (!user) {
-        user = await User.create({
-          googleId: profile.id,
-          nome: profile.displayName,
-          email: profile.emails[0].value,
-          // Outras informações que você queira salvar
-        });
+        // 1️⃣ Tenta encontrar usuário pelo googleId
+        let user = await User.findOne({ where: { googleId: googleIdStr } });
+
+        // 2️⃣ Se não existir, cria um novo usuário
+        if (!user) {
+          user = await User.create({
+            googleId: googleIdStr,
+            nome: profile.displayName,
+            email: profile.emails[0].value,
+            foto: profile.photos[0]?.value, // opcional
+          });
+        }
+
+        // 3️⃣ Retorna o usuário encontrado ou criado
+        return done(null, user);
+      } catch (err) {
+        console.error("Erro no Passport GoogleStrategy:", err);
+        return done(err, null);
       }
-
-      // Retorna o usuário encontrado ou recém-criado
-      return done(null, user);
-    } catch (err) {
-      return done(err, null);
     }
-  }
-));
+  )
+);
 
 
 passport.serializeUser((user, done) => {

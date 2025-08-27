@@ -23,21 +23,20 @@ module.exports = {
 
   async register(req, res) {
   try {
-    const { nome, email, senha, tipoUser, endereco, telefone, cpf } = req.body;
+    const { nome, email, senha, tipoUser, telefone, cpf } = req.body;
 
     const existente = await User.findOne({ where: { email } });
     if (existente) {
       return res.status(400).json({ error: "Email já cadastrado" });
     }
 
-    const usuario = await User.create({ nome, email, senha, tipoUser, endereco, telefone, cpf });
+    const usuario = await User.create({ nome, email, senha, tipoUser, telefone, cpf });
 
     return res.status(201).json({
       usuario: {
         nome: usuario.nome,
         email: usuario.email,
         tipoUser: usuario.tipoUser,
-        endereco: usuario.endereco,
         telefone: usuario.telefone,
         cpf: usuario.cpf
         // senha não precisa ser retornada por segurança
@@ -53,11 +52,11 @@ module.exports = {
 
   async updateUser(req, res) {
     const { idUser } = req.params;
-    const { nome, cpf, telefone, endereco, tipoUser, email, senha } = req.body;
+    const { nome, cpf, telefone, tipoUser, email, senha } = req.body;
 
     try {
       const atualizado = await User.update(
-        { nome, cpf, telefone, endereco, tipoUser, email, senha },
+        { nome, cpf, telefone, tipoUser, email, senha },
         { where: { idUser } }
       );
 
