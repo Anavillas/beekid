@@ -1,0 +1,242 @@
+
+    <link rel="stylesheet" href="BeeKidCSS.css">
+
+    <!-- ==================== -->
+    <!-- Tela principal de login -->
+    <!-- ==================== -->
+    <main class="container">
+        <div class="roxo">
+            <form id="loginForm">
+
+                <h1>BeeKid</h1>
+               
+                <!-- Campos de login -->
+                <div class="input_box">
+                    <input id="cpfLogin" placeholder="CPF" required />
+                    <i class="bx bxs-user"></i>
+                </div>
+               
+                <div class="input_box">
+                    <input placeholder="Senha" type="password" id="senhaLogin" required />
+                    <i class="bx bx-show toggleSenha" 
+                       style="position:absolute; right:20px; top:50%; transform: translateY(-50%); cursor:pointer;"></i>
+                </div>
+
+                <!-- Botão de login -->
+                <button class="login" type="submit">Entrar</button>
+
+                <h4>__________ ou __________</h4>
+
+                <!-- Login com Google -->
+                <button class="loginGG" type="button" id="btnLoginGoogle">
+                    <img src="./Imagens/google-logo.png" alt="" style="height:20px; vertical-align: middle; margin-right: 8px;">
+                    Login com Google
+                </button>
+
+                <!-- Botão de cadastro -->
+                <div>
+                    <button class="registrar" type="button" id="btnAbrirModal">CADASTRAR</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- ==================== -->
+    <!-- Modal de cadastro principal -->
+    <!-- ==================== -->
+    <div id="modalCadastro" class="modal">
+        <div class="modal-content">
+            <button class="voltar" id="btnFecharCadastro">
+                <img src="./Imagens/BotaoVoltar.png" alt="Voltar">
+            </button>
+           
+            <h1>Cadastro</h1>
+            <input type="text" placeholder="Nome" id="nomeCadastro">
+            <input type="text" placeholder="CPF" id="cpfCadastro">
+            <input type="password" placeholder="Senha" id="senhaCadastro">
+            <i class='bx bx-show toggleSenha' style="position:absolute; right:20px; top:calc(50% + 2px); transform: translateY(-50%); cursor:pointer;"></i>
+           
+            <!-- Seleção de tipo -->
+            <div class="roles">
+                <label class="role-option">
+                    <input type="radio" name="tipo" value="responsavel" id="radioResponsavel">
+                    <img src="./Imagens/responsavelPng.png" alt="Responsável">
+                    <p>Responsável</p>
+                </label>
+
+                <span class="ou">ou</span>
+
+                <label class="role-option">
+                    <input type="radio" name="tipo" value="cuidador">
+                    <img src="./Imagens/cuidadorPng.png" alt="Cuidador">
+                    <p>Cuidador</p>
+                </label>
+            </div>
+
+            <button class="registrar" id="btnCadastrar">CADASTRAR</button>
+        </div>
+    </div>
+
+    <!-- ==================== -->
+    <!-- Modal de erro -->
+    <!-- ==================== -->
+    <div id="modalErro" class="modal">
+        <div class="modal-content aviso">
+            <p>Por favor, preencha todos os campos!</p>
+            <button id="btnFecharErro">Fechar</button>
+        </div>
+    </div>
+
+    <!-- ==================== -->
+    <!-- Modal de sucesso -->
+    <!-- ==================== -->
+    <div id="modalSucesso" class="modal">
+        <div class="modal-content aviso">
+            <p>Cadastro concluído com sucesso!</p>
+            <button id="btnFecharSucesso">Fechar</button>
+        </div>
+    </div>
+
+    <!-- ==================== -->
+    <!-- Modal do responsável (segunda etapa do cadastro) -->
+    <!-- ==================== -->
+    <div id="modalResponsavel" class="modal">
+        <div class="modal-content">
+            <button class="voltar" id="btnFecharResponsavel">
+                <img src="./Imagens/BotaoVoltar.png" alt="Voltar">
+            </button>
+           
+            <h1>Cadastro Criança</h1>
+
+            <!-- Foto principal -->
+            <div class="foto-principal-container">
+                <img src="/Imagens/Icones crianças/Icone Base.jpg" id="fotoPrincipal" alt="texste">
+            </div>
+
+            <!-- Overlay da galeria -->
+            <div class="overlayGaleria" id="overlayGaleria">
+                <div class="galeriaConteudo">
+                    <span class="fecharGaleria" id="fecharGaleria">&times;</span>
+                    <h3>Escolha sua foto de perfil</h3>
+                    <div class="fotoGaleria">
+                        <img src="./Imagens/Icones crianças/CriancaBranca" class="perfil-opcao" alt="Foto 1">
+                        <img src="./Imagens/Icones crianças/CriancaBrancaM" class="perfil-opcao" alt="Foto 2">
+                        <img src="./Imagens/Icones crianças/CriancaBrancaO" class="perfil-opcao" alt="Foto 3">
+                        <img src="./Imagens/Icones crianças/CriancaNegra" class="perfil-opcao" alt="Foto 4">
+                        <img src="./Imagens/Icones crianças/CriancaNegraM" class="perfil-opcao" alt="Foto 5">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulário de dados do responsável -->
+            <div class="form-campos">
+                <input type="text" placeholder="Nome completo">
+                <input type="date" placeholder="Data de Nascimento">
+                <input type="text" placeholder="Telefone do responsavel">
+            </div>
+
+            <button class="registrar" id="btnFinalizarCadastro">FINALIZAR CADASTRO</button>
+        </div>
+    </div>
+
+    <!-- ==================== -->
+    <!-- Script JS -->
+    <!-- ==================== -->
+    <script src="auth.js"></script>
+    <script>
+    // Login normal (CPF + senha)
+    document.getElementById('loginForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const cpf = document.getElementById('cpfLogin').value;
+        const senha = document.getElementById('senhaLogin').value;
+
+        try {
+            const response = await fetch('http://localhost:3000/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ cpf, senha })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert('Login realizado com sucesso!');
+                localStorage.setItem('token', data.token);
+                window.location.href = '/dashboard';
+            } else {
+                alert('Erro no login: ' + data.message);
+            }
+        } catch (error) {
+            alert('Erro de conexão com o servidor.');
+        }
+    });
+
+    // Login com Google
+    document.getElementById("btnLoginGoogle").addEventListener("click", () => {
+    // Redireciona para o backend (rota Google OAuth)
+    window.location.href = "http://localhost:3000/api/auth/google";
+    });
+    </script>
+    <script>
+        const btnAbrirModal = document.getElementById("btnAbrirModal");
+        const modalCadastro = document.getElementById("modalCadastro");
+        const btnFecharCadastro = document.getElementById("btnFecharCadastro");
+        const btnCadastrar = document.getElementById("btnCadastrar");
+        const modalResponsavel = document.getElementById("modalResponsavel");
+        const btnFecharResponsavel = document.getElementById("btnFecharResponsavel");
+        const modalErro = document.getElementById("modalErro");
+        const btnFecharErro = document.getElementById("btnFecharErro");
+        const modalSucesso = document.getElementById("modalSucesso");
+        const btnFecharSucesso = document.getElementById("btnFecharSucesso");
+
+        btnAbrirModal.addEventListener("click", () => {
+            modalCadastro.style.display = "block";
+        });
+
+        btnFecharCadastro.addEventListener("click", () => {
+            modalCadastro.style.display = "none";
+        });
+
+        btnCadastrar.addEventListener("click", () => {
+            const nome = document.getElementById("nomeCadastro").value;
+            const cpf = document.getElementById("cpfCadastro").value;
+            const senha = document.getElementById("senhaCadastro").value;
+            const tipo = document.querySelector('input[name="tipo"]:checked');
+
+            if (nome && cpf && senha && tipo) {
+                if (tipo.value === "responsavel") {
+                    modalCadastro.style.display = "none";
+                    modalResponsavel.style.display = "block";
+                } else {
+                    modalCadastro.style.display = "none";
+                    modalSucesso.style.display = "block";
+                }
+            } else {
+                modalErro.style.display = "block";
+            }
+        });
+        
+        btnFecharResponsavel.addEventListener("click", () => {
+            modalResponsavel.style.display = "none";
+            modalCadastro.style.display = "block";
+        });
+
+        btnFecharErro.addEventListener("click", () => {
+            modalErro.style.display = "none";
+        });
+
+        btnFecharSucesso.addEventListener("click", () => {
+            modalSucesso.style.display = "none";
+        });
+
+        // Toggle de senha
+        const toggleSenha = document.querySelector('.toggleSenha');
+        toggleSenha.addEventListener('click', function() {
+            const senhaInput = this.previousElementSibling;
+            const tipo = senhaInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            senhaInput.setAttribute('type', tipo);
+            this.classList.toggle('bx-show');
+            this.classList.toggle('bx-hide');
+        });
+    </script>

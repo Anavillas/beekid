@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/sidebar.css">
+    <link rel="stylesheet" href="/crianca.css">
+    <link rel="stylesheet" href="/perfil.css">
+    <link rel="stylesheet" href="/cuidador.css">
+    <link rel="stylesheet" href="/selecionarCriancas.css">
+
+
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+  <%- include('../partials/sidebar') %>
+
+  <main>
+    <%- body %> <!-- aqui o express-ejs-layouts vai injetar o conteúdo -->
+  </main>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get("token");
+
+    if (token) {
+        localStorage.setItem("token", token);
+        // Opcional: remove o token da URL para limpeza e segurança
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+</script>
+</body>
+</html>

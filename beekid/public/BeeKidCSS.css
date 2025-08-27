@@ -1,0 +1,546 @@
+/* ====================================== */
+/* IMPORTAÇÃO DE FONTES */
+/* ====================================== */
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&display=swap');
+
+/* ====================================== */
+/* RESET GLOBAL */
+/* ====================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ====================================== */
+/* ESTILO DO BODY */
+/* ====================================== */
+body {
+    display: flex;
+    justify-content: right;
+    align-items: center;
+    min-height: 100vh;
+    background-size: cover;
+    background-color: #36288a;
+    background-position: center;
+    overflow: hidden;
+    font-family: 'Baloo 2', cursive;
+}
+
+/* ====================================== */
+/* CONTAINER PRINCIPAL */
+/* ====================================== */
+.container {
+    width: 420px;
+    background-color: transparent;
+    padding: 30px 30px;
+    margin-right: 8%;
+    max-width: 90vw;
+    box-sizing: border-box;
+}
+
+.container h1 {
+    font-family: 'Baloo 2', cursive;
+    font-size: 80px;
+    text-align: center;
+    color: #f8bc34;
+    margin-bottom: 15px;
+}
+
+.container h4 {
+    font-size: 15px;
+    text-align: center;
+    padding: 15px;
+}
+
+/* ====================================== */
+/* INPUT BOX */
+/* ====================================== */
+.input_box {
+    position: relative;
+    width: 100%;
+    height: 50px;
+    margin: 30px 0;
+}
+.input_box i {
+    position: absolute;
+    right: 20px;
+    font-size: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #646464;
+    cursor: pointer;
+}
+.input_box input {
+    width: 100%;
+    height: 100%;
+    background-color: rgb(224, 224, 224);
+    border: none;
+    font-size: 16px;
+    color: rgb(39, 39, 39);
+    padding: 20px 45px 20px 20px;
+    border-radius: 40px;
+}
+
+.input_box i {
+    position: absolute;
+    right: 20px;
+    font-size: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #646464;
+}
+
+/* ====================================== */
+/* BOTOES DE LOGIN E CADASTRO */
+/* ====================================== */
+.login {
+    width: 100%;
+    height: 50px;
+    background-color: #ffffff;
+    border: none;
+    border-radius: 40px;
+    cursor: pointer;
+    color: black;
+    font-weight: 600;
+}
+
+.login:hover {
+    background-color: rgb(63, 114, 143);
+    border: 2px solid;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.loginGG {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 50px;
+    background-color: rgb(245, 243, 255);
+    border: none;
+    border-radius: 40px;
+    cursor: pointer;
+    color: black;
+    font-weight: 600;
+    font-size: 15px;
+    gap: 10px;
+    padding: 0 20px;
+}
+
+.loginGG:hover {
+    background-color: rgb(218, 218, 218);
+    border: 2px solid;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.loginGG img {
+    height: 24px;
+    width: auto;
+    display: block;
+}
+
+.registrar {
+    width: 100%;
+    height: 50px;
+    background-color: #f9bb01;
+    border: none;
+    border-radius: 40px;
+    cursor: pointer;
+    color: rgb(255, 255, 255);
+    font-weight: 600;
+    margin-top: 15px;
+}
+
+.registrar:hover {
+    background-color: rgb(224, 153, 22);
+    border: 2px solid;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* ====================================== */
+/* HEADER E NAVEGAÇÃO */
+/* ====================================== */
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: transparent;
+    color: white;
+    padding: 15px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    z-index: 1000;
+    height: 60px;
+    padding-left: 26%;
+    font-family: Arial, sans-serif;
+    box-sizing: border-box;
+}
+
+nav {
+    display: flex;
+    gap: 30px;
+}
+
+nav a {
+    color: #6b6b6b;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 8px 15px;
+    border-radius: 20px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+nav a:hover {
+    color: #9c9ef5;
+    background-color: #e0d4f7;
+}
+
+/* ====================================== */
+/* BLOCO ROXO PRINCIPAL */
+/* ====================================== */
+.roxo {
+    background: linear-gradient(to top, #6b57e0, #5c47d4, #4a39b5, #36288a);
+    color: white;
+    padding: 40px 30px 30px 30px;
+    border-radius: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 420px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* ====================================== */
+/* RESPONSIVIDADE */
+/* ====================================== */
+@media (max-width: 768px) {
+    body {
+        justify-content: center;
+        padding-top: 60px;
+    }
+
+    .container {
+        margin-right: 0;
+        width: 90%;
+        padding: 20px;
+    }
+
+    header {
+        padding-left: 10px;
+        padding-right: 10px;
+        height: auto;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    nav {
+        gap: 15px;
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+    }
+
+    nav a {
+        padding: 6px 10px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .container h1 {
+        font-size: 18px;
+        margin-bottom: 40px;
+    }
+
+    .input_box {
+        height: 45px;
+        margin: 20px 0;
+    }
+
+    .input_box input {
+        font-size: 14px;
+        padding: 15px 40px 15px 15px;
+    }
+
+    .login, .loginGG, .registrar {
+        height: 45px;
+        font-size: 14px;
+    }
+
+    .container h4 {
+        padding: 10px;
+        font-size: 13px;
+        text-align: center;
+    }
+
+    header {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+}
+
+/* ====================================== */
+/* MODAL CONTAINER */
+/* ====================================== */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    justify-content: center;
+    align-items: center;
+}
+
+/* ====================================== */
+/* MODAL CONTENT PADRÃO */
+/* ====================================== */
+.modal-content {
+    background: linear-gradient(to top, #6b57e0, #5c47d4, #4a39b5, #36288a);
+    padding: 50px 40px 30px 40px;
+    border-radius: 20px;
+    text-align: center;
+    width: 400px;
+    min-height: 520px;
+    color: #fff;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* ====================================== */
+/* BOTÃO VOLTAR DO MODAL */
+/* ====================================== */
+.voltar {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.voltar img {
+    display: block;
+    width: 60px;
+    height: 32px;
+}
+
+/* ====================================== */
+/* INPUTS DO MODAL */
+/* ====================================== */
+.modal-content input {
+    width: 100%;
+    height: 45px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 40px;
+    padding: 0 15px;
+    font-size: 15px;
+    outline: none;
+}
+
+/* ====================================== */
+/* BOTÃO CADASTRAR DO MODAL */
+/* ====================================== */
+.modal-content .registrar {
+    width: 70%;
+    height: 45px;
+    background-color: #f9bb01;
+    border: none;
+    border-radius: 40px;
+    cursor: pointer;
+    color: white;
+    font-weight: 600;
+    font-size: 15px;
+    margin-top: 20px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.modal-content .registrar:hover {
+    background-color: rgb(224, 153, 22);
+    transform: scale(1.02);
+}
+
+/* ====================================== */
+/* CONTAINER LADO A LADO (ROLES) */
+/* ====================================== */
+.roles {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    margin: 15px 0;
+}
+
+.roles .ou {
+    color: white;
+    font-weight: bold;
+    margin: 0 10px;
+}
+
+.role-option input {
+    display: none;
+}
+
+.role-option img {
+    width: 70px;
+    border-radius: 15px;
+    transition: 0.3s;
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+.role-option p {
+    margin-top: 5px;
+    color: white;
+    font-size: 14px;
+    text-align: center;
+}
+
+.role-option input:checked + img {
+    opacity: 1;
+    box-shadow: 0 0 10px #FFD700;
+    transform: scale(1.05);
+}
+
+.role-option img:hover {
+    opacity: 0.9;
+    transform: scale(1.03);
+}
+
+/* ====================================== */
+/* MODAL AVISO (ERRO/SUCESSO) */
+/* ====================================== */
+.modal-content.aviso {
+    margin-top: 30%;
+    background: transparent;
+    padding: 20px 40px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.modal-content.aviso p {
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.modal-content.aviso button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 30px;
+    background-color: #36288a;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.modal-content.aviso button:hover {
+    background-color: #5c47d4;
+}
+
+/* ====================================== */
+/* FOTO PRINCIPAL MODAL RESPONSAVEL */
+/* ====================================== */
+.foto-principal-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.foto-principal-container img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid #ccc;
+    transition: transform 0.2s, border 0.2s;
+}
+
+.foto-principal-container img:hover {
+    transform: scale(1.1);
+    border-color: #f0a500;
+}
+
+/* ====================================== */
+/* OVERLAY GALERIA */
+/* ====================================== */
+.overlayGaleria {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.galeriaConteudo {
+    background:transparent;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    position: relative;
+}
+
+.galeriaConteudo h3 {
+    margin-bottom: 15px;
+}
+
+.galeriaConteudo .fotoGaleria {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.galeriaConteudo .fotoGaleria img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: transform 0.2s, border 0.2s;
+}
+
+.galeriaConteudo .fotoGaleria img:hover {
+    transform: scale(1.1);
+}
+
+.galeriaConteudo .fotoGaleria img.selecionado {
+    border: 2px solid #f0a500;
+}
+
+.fecharGaleria {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 25px;
+    cursor: pointer;
+}
+
+/* ====================================== */
+/* FORMULARIO VERTICAL MODAL RESPONSAVEL */
+/* ====================================== */
+.form-campos {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.overlayGaleria h3 {
+    color: #ffffff;
+}

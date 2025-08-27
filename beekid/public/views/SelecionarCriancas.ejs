@@ -1,0 +1,139 @@
+
+
+    <div class="main-content">
+        <h1>Selecione a Criança</h1>
+
+        <div id="no-crianca-message" style="display: none;">
+            <p>Você não tem nenhuma criança associada.</p>
+            <p>Clique no botão abaixo para adicionar uma nova criança.</p>
+        </div>
+
+        <div class="profiles" id="profiles-container">
+            <div class="profile-card adicionar-card" id="btn-adicionar-crianca">
+                <i class="fa-solid fa-plus icon-add"></i>
+                <h2>Adicionar Criança</h2>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="modalAdicionarCrianca">
+        <div class="modal-content">
+            <h2>Adicionar Nova Criança</h2>
+            <input type="text" id="nomeCriancaInput" placeholder="Nome da Criança">
+            <input type="text" id="cpfCriancaInput" placeholder="CPF da Criança">
+            <input type="date" id="dataNascimentoCriancaInput">
+            <button onclick="adicionarNovaCrianca()">Salvar</button>
+        </div>
+    </div>
+    
+    <script>
+async function carregarCriancas() {
+    const container = document.getElementById('profiles-container');
+    const noCriancaMessage = document.getElementById('no-crianca-message');
+
+    // Pega o token do localStorage
+    const token = localStorage.getItem('token');
+
+    // Limpa os cards existentes
+    container.innerHTML = '';
+    noCriancaMessage.style.display = 'none';
+
+    try {
+        const response = await fetch('/api/criancas', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Erro HTTP! Status: ${response.status}`);
+        }
+
+        const criancas = await response.json();
+
+        // Cria o botão de adicionar criança dinamicamente
+        const btnAdicionarHTML = `
+            <div class="profile-card adicionar-card" id="btn-adicionar-crianca">
+                <i class="fa-solid fa-plus icon-add"></i>
+                <h2>Adicionar Criança</h2>
+            </div>
+        `;
+        container.insertAdjacentHTML('beforeend', btnAdicionarHTML);
+
+        const btnAdicionarCrianca = document.getElementById('btn-adicionar-crianca');
+        btnAdicionarCrianca.onclick = () => openModal('modalAdicionarCrianca');
+
+        if (criancas.length === 0) {
+            noCriancaMessage.style.display = 'block';
+        } else {
+            criancas.forEach(crianca => {
+                const fotoDaCrianca = crianca.foto;
+                const urlFinal = (fotoDaCrianca && fotoDaCrianca !== 'https://via.placeholder.com/40')
+                    ? fotoDaCrianca
+                    : './Imagens/Icones crianças/Icone_Base.jpg';
+
+                const cardHTML = `
+                    <div class="profile-card">
+                        <img src="${urlFinal}" alt="Foto da criança">
+                        <h2>${crianca.nome}</h2>
+                        <button class="btn-acessar" onclick="acessarPerfil(${crianca.idCrianca})">Acessar</button>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', cardHTML);
+            });
+        }
+    } catch (error) {
+        console.error("Erro ao carregar crianças:", error);
+        noCriancaMessage.textContent = "Ocorreu um erro ao carregar as crianças. Tente novamente mais tarde.";
+        noCriancaMessage.style.display = 'block';
+    }
+}
+
+// Funções de controle do modal e acesso
+function openModal(modalId) {
+    document.getElementById(modalId).style.display = 'flex';
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+}
+
+async function adicionarNovaCrianca() {
+    const nome = document.getElementById('nomeCriancaInput').value;
+    const cpf = document.getElementById('cpfCriancaInput').value;
+    const dataNascimento = document.getElementById('dataNascimentoCriancaInput').value;
+    const token = localStorage.getItem('token');
+
+    try {
+        const response = await fetch('/api/criancas', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ nome, cpf, dataNascimento })
+        });
+
+        if (response.ok) {
+            alert('Criança adicionada com sucesso!');
+            closeModal('modalAdicionarCrianca');
+            carregarCriancas();
+        } else {
+            const errorData = await response.json();
+            alert('Erro ao adicionar criança: ' + errorData.error);
+        }
+    } catch (error) {
+        console.error("Erro ao adicionar criança:", error);
+        alert('Erro de conexão ao adicionar criança.');
+    }
+}
+
+function acessarPerfil(criancaId) {
+    window.location.href = `/criancas/${criancaId}`;
+}
+
+// Chama a função ao carregar a página
+document.addEventListener('DOMContentLoaded', carregarCriancas);
+</script>

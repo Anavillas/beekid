@@ -1,0 +1,22 @@
+module.exports = (sequelize, DataTypes) => {
+  const AssociacaoCuidadorCrianca = sequelize.define("AssociacaocuidadorCrianca", {
+    idAssociacao: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
+    },
+    id_cuidador: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    id_crianca: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    }
+  }, {
+    tableName: 'Associacao_Cuidador_Crianca',
+    timestamps: false
+  });
+
+  return AssociacaoCuidadorCrianca;
+};

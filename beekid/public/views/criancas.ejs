@@ -1,0 +1,81 @@
+<div class="main">
+    <div class="header">
+        <div class="profile-info">
+            <%
+              let fotoUrl = crianca.foto;
+              if (!fotoUrl || fotoUrl === 'https://via.placeholder.com/40') {
+                fotoUrl = './Imagens/Icones crianças/Icone_Base.jpg';
+              }
+            %>
+            <img src="<%= fotoUrl %>" alt="foto criança">
+            <h2 id="headerName"><%= crianca.nome %></h2>
+        </div>
+    </div>
+    <div class="cards">
+        <div class="card" id="atividades">
+            <div class="card-header">
+                <h3>Atividades do Dia</h3>
+                <% if (crianca.papelDoUsuario === 'responsavel' || crianca.papelDoUsuario === 'ambos') { %>
+                  <button class="add-btn" onclick="openModal('atividades')">+ Adicionar</button>
+                <% } %>
+            </div>
+        </div>
+        <div class="card" id="alergias">
+            <div class="card-header">
+                <h3>Alergias e Restrições</h3>
+                <% if (crianca.papelDoUsuario === 'responsavel' || crianca.papelDoUsuario === 'ambos') { %>
+                  <button class="add-btn" onclick="openModal('alergias')">+ Adicionar</button>
+                <% } %>
+            </div>
+        </div>
+        <div class="card" id="cuidadores">
+            <div class="card-header">
+                <h3>Cuidador</h3>
+                <% if (crianca.papelDoUsuario === 'responsavel' || crianca.papelDoUsuario === 'ambos') { %>
+                  <button class="add-btn" onclick="openCpfModal()">+ Adicionar</button>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+HTML
+
+<div class="associar-cuidador-form">
+    <h3>Associar Cuidador</h3>
+    <input type="email" id="emailCuidadorInput" placeholder="E-mail do cuidador" required>
+    <button onclick="associarCuidador()">Associar</button>
+</div>
+
+<script>
+    const idCrianca = "<%= crianca.idCrianca %>"; // Pega o ID da criança do servidor
+
+    async function associarCuidador() {
+        const email = document.getElementById('emailCuidadorInput').value;
+        if (!email) {
+            alert("Por favor, digite um e-mail.");
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/associar/cuidador', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Adicione o token de autenticação se necessário
+                },
+                body: JSON.stringify({ emailCuidador: email, idCrianca: idCrianca })
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                alert(result.message);
+            } else {
+                alert("Erro: " + result.message);
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Erro ao conectar com o servidor.");
+        }
+    }
+</script>

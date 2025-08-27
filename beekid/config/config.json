@@ -1,0 +1,9 @@
+{
+  "development": {
+    "username": "root",
+    "password": "maleninha0202",
+    "database": "sistema_beekid",
+    "host": "localhost",
+    "dialect": "mysql"
+  }
+}
