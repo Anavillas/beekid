@@ -109,9 +109,8 @@ function renderCard(crianca, container) {
 
   const cardHTML = `
     <div class="profile-card">
-      <img src="${urlFinal}" alt="Foto da criança">
       <h2>${crianca.nome}</h2>
-      <button class="btn-acessar" onclick="acessarPerfil(${crianca.idCrianca})">Acessar</button>
+      <button class="add-btn" onclick="acessarPerfil(${crianca.idCrianca})">Acessar</button>
     </div>
   `;
   container.insertAdjacentHTML('beforeend', cardHTML);

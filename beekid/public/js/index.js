@@ -92,10 +92,11 @@ btnCadastrar.addEventListener("click", async () => {
         const data = await response.json();
 
         if (response.ok) {
-            alert('Cadastro concluído com sucesso!');
-            localStorage.setItem('token', data.token);
-            modalCadastro.style.display = "none";
-            modalResponsavel.style.display = "block";
+            if (response.ok) {
+              localStorage.setItem('token', data.token);
+              window.location.replace('/dashboard');
+          }
+
         } else {
             alert('Erro no cadastro: ' + data.error);
         }

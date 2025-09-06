@@ -49,7 +49,6 @@
 <%- include('partials/modal-cadastro'); %>
 <%- include('partials/modal-erro'); %>
 <%- include('partials/modal-sucesso'); %>
-<%- include('partials/modal-responsavel'); %>
 
 
 
@@ -61,12 +60,11 @@
 // ==================== LOGIN ====================
 document.getElementById('loginForm').addEventListener('submit', async function (e) {
   e.preventDefault();
-
   const email = document.getElementById('emailLogin').value;
   const senha = document.getElementById('senhaLogin').value;
 
   try {
-    const response = await fetch('http://localhost:3000/api/auth/login', {
+    const response = await fetch('/api/auth/login', { // dica: use caminho relativo
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, senha })
@@ -75,11 +73,11 @@ document.getElementById('loginForm').addEventListener('submit', async function (
     const data = await response.json();
 
     if (response.ok) {
-      // alert('Login realizado com sucesso!'); // Linha que pode ser removida
       localStorage.setItem('token', data.token);
-       window.location.href = `/dashboard?token=${data.token}`; // Redirecionamento correto
+      // ✅ template string correta
+      window.location.href = `/dashboard?token=${encodeURIComponent(data.token)}`;
     } else {
-      alert('Erro no login: ' + data.message);
+      alert('Erro no login: ' + (data.message || 'Tente novamente.'));
     }
   } catch (error) {
     alert('Erro de conexão com o servidor.');
@@ -88,7 +86,7 @@ document.getElementById('loginForm').addEventListener('submit', async function (
 
 // ==================== LOGIN GOOGLE ====================
 document.getElementById("btnLoginGoogle").addEventListener("click", () => {
-  window.location.href = "http://localhost:3000/api/auth/google";
+  window.location.href = "/api/auth/google";
 });
 
 // ==================== MODAIS ====================
@@ -103,21 +101,16 @@ const btnFecharErro = document.getElementById("btnFecharErro");
 const modalSucesso = document.getElementById("modalSucesso");
 const btnFecharSucesso = document.getElementById("btnFecharSucesso");
 
-btnAbrirModal.addEventListener("click", () => {
-  modalCadastro.style.display = "block";
-});
+btnAbrirModal.addEventListener("click", () => { modalCadastro.style.display = "block"; });
+btnFecharCadastro.addEventListener("click", () => { modalCadastro.style.display = "none"; });
 
-btnFecharCadastro.addEventListener("click", () => {
-  modalCadastro.style.display = "none";
-});
-
+// ==================== CADASTRO ====================
 btnCadastrar.addEventListener("click", async () => {
-  // Captura os valores dos campos do cadastro
   const nome = document.getElementById("nomeCadastro").value;
-  const cpf = document.getElementById("cpfCadastro").value; // ⚡ precisa existir no modal
+  const cpf = document.getElementById("cpfCadastro").value;   // ⚡ precisa existir no modal
   const email = document.getElementById("emailCadastro").value;
   const senha = document.getElementById("senhaCadastro").value;
-  const tipoUser = 'responsavel'; // Tipo de usuário fixo
+  const tipoUser = 'responsavel';
 
   if (!nome || !cpf || !email || !senha) {
     modalErro.style.display = 'block';
@@ -125,27 +118,37 @@ btnCadastrar.addEventListener("click", async () => {
   }
 
   try {
-    const response = await fetch('http://localhost:3000/api/auth/register', {
+    const response = await fetch('/api/auth/register', { // dica: use caminho relativo
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        nome,
-        cpf,
-        email,
-        senha,
-        tipoUser
-      })
+      body: JSON.stringify({ nome, cpf, email, senha, tipoUser })
     });
 
     const data = await response.json();
 
     if (response.ok) {
+      // Se o backend já retorna token após o cadastro:
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+        // ✅ redireciona direto para o dashboard
+        window.location.href = `/dashboard?token=${encodeURIComponent(data.token)}`;
+        return;
+      }
+
+      // Se não retornar token, você pode:
+      // 1) redirecionar sem token (se o dashboard lê do cookie de sessão)
+      // window.location.href = "/dashboard";
+
+      // 2) ou abrir modal do responsável e depois redirecionar:
+      // modalCadastro.style.display = "none";
+      // modalResponsavel.style.display = "block";
+      // ...quando finalizar esse modal, faça window.location.href = "/dashboard";
+      
+      // Para manter compatibilidade:
       alert('Cadastro concluído com sucesso!');
-      localStorage.setItem('token', data.token);
-      modalCadastro.style.display = "none";
-      modalResponsavel.style.display = "block"; 
+      window.location.href = "/dashboard";
     } else {
-      alert('Erro no cadastro: ' + data.error);
+      alert('Erro no cadastro: ' + (data.error || data.message || 'Tente novamente.'));
     }
   } catch (error) {
     console.error('Erro de conexão:', error);
@@ -153,18 +156,8 @@ btnCadastrar.addEventListener("click", async () => {
   }
 });
 
-btnFecharResponsavel.addEventListener("click", () => {
-  modalResponsavel.style.display = "none";
-  modalCadastro.style.display = "block";
-});
-
-btnFecharErro.addEventListener("click", () => {
-  modalErro.style.display = "none";
-});
-
-btnFecharSucesso.addEventListener("click", () => {
-  modalSucesso.style.display = "none";
-});
+btnFecharErro.addEventListener("click", () => { modalErro.style.display = "none"; });
+btnFecharSucesso.addEventListener("click", () => { modalSucesso.style.display = "none"; });
 
 // ==================== TOGGLE SENHA ====================
 const toggleSenha = document.querySelector('.toggleSenha');

@@ -1,18 +1,2 @@
-<div class="content">
-  <h2>Dashboard</h2>
-  <p>Bem-vindo ao seu dashboard, <span id="profileName">carregando...</span></p>
-</div>
-<script>
-  (function() {
-    const qs = new URLSearchParams(location.search);
-    const t = qs.get('token');
-    if (t) {
-      // se você usa localStorage no front:
-      localStorage.setItem('token', t);
-      // limpar a URL
-      qs.delete('token');
-      const clean = location.pathname + (qs.toString() ? '?'+qs.toString() : '');
-      history.replaceState({}, '', clean);
-    }
-  })();
-</script>
+<h2>Dashboard</h2>
+<p>Olá, <%= nomeUsuario %>!</p>
