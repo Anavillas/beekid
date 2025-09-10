@@ -1,0 +1,71 @@
+<!-- Modal de Confirmação -->
+<div id="confirmModal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="confirmTitle">
+  <div class="modal-card" role="document">
+    <div class="modal-head">
+      <h2 id="confirmTitle">Confirmar ação</h2>
+      <button class="modal-close" type="button" aria-label="Fechar">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <p id="confirmMessage">Tem certeza que deseja continuar?</p>
+    </div>
+
+    <div class="modal-foot">
+      <button id="confirmCancelBtn" class="btn ghost" type="button">Cancelar</button>
+      <button id="confirmOkBtn" class="btn primary" type="button">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  // Cria window.showConfirm(title, message, confirmText?, cancelText?)
+  window.showConfirm = function(title, message, okText = 'Confirmar', cancelText = 'Cancelar'){
+    return new Promise((resolve) => {
+      const modal   = document.getElementById('confirmModal');
+      const h2      = document.getElementById('confirmTitle');
+      const msg     = document.getElementById('confirmMessage');
+      const btnOk   = document.getElementById('confirmOkBtn');
+      const btnNo   = document.getElementById('confirmCancelBtn');
+      const btnX    = modal.querySelector('.modal-close');
+
+      if(!modal){ 
+        // fallback de segurança
+        const ans = window.confirm(message || title || 'Confirmar?');
+        resolve(!!ans);
+        return;
+      }
+
+      h2.textContent  = title || 'Confirmar ação';
+      msg.textContent = message || 'Tem certeza que deseja continuar?';
+      btnOk.textContent = okText || 'Confirmar';
+      btnNo.textContent = cancelText || 'Cancelar';
+
+      // handlers (garantir limpeza p/ evitar múltiplos listeners)
+      const cleanup = () => {
+        btnOk.removeEventListener('click', onOk);
+        btnNo.removeEventListener('click', onCancel);
+        btnX.removeEventListener('click', onCancel);
+        modal.removeEventListener('click', onBackdrop);
+        document.removeEventListener('keydown', onEsc);
+        modal.style.display = 'none';
+        modal.setAttribute('aria-hidden', 'true');
+      };
+      const onOk = () => { cleanup(); resolve(true); };
+      const onCancel = () => { cleanup(); resolve(false); };
+      const onBackdrop = (e) => { if(e.target === modal) onCancel(); };
+      const onEsc = (e) => { if(e.key === 'Escape') onCancel(); };
+
+      btnOk.addEventListener('click', onOk);
+      btnNo.addEventListener('click', onCancel);
+      btnX.addEventListener('click', onCancel);
+      modal.addEventListener('click', onBackdrop);
+      document.addEventListener('keydown', onEsc);
+
+      modal.style.display = 'grid';
+      modal.setAttribute('aria-hidden', 'false');
+      btnOk.focus();
+    });
+  };
+})();
+</script>

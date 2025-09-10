@@ -3,14 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
+  <title><%= title %></title>
   <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/crianca.css">
-    <link rel="stylesheet" href="/modais.css">
-
-
-
-
+  <link rel="stylesheet" href="/crianca.css">
+  <link rel="stylesheet" href="/modais.css">
+  <link rel="stylesheet" href="/sidebar.css">
+  <link rel="stylesheet" href="/perfil-cuidador.css">
+  <link rel="stylesheet" href="/perfil.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
@@ -19,15 +18,20 @@
   <main>
     <%- body %> <!-- aqui o express-ejs-layouts vai injetar o conteúdo -->
   </main>
+
+  <!-- ⚡ aqui fica o include do modal -->
+  <%- include('../partials/modal-alert-template') %>
+  <%- include('../partials/modal-confirm-template') %>
+
   <script>
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get("token");
 
     if (token) {
-        localStorage.setItem("token", token);
-        // Opcional: remove o token da URL para limpeza e segurança
-        window.history.replaceState({}, document.title, window.location.pathname);
+      localStorage.setItem("token", token);
+      // Opcional: remove o token da URL para limpeza e segurança
+      window.history.replaceState({}, document.title, window.location.pathname);
     }
-</script>
+  </script>
 </body>
 </html>

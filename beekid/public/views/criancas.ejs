@@ -1,52 +1,89 @@
 <div class="main">
-  <!-- Coluna esquerda (foto + atividades + cuidadores) -->
-  <div class="left-column">
-    <!-- Foto + nome -->
-    <div class="card header">
-      <div class="profile-info">
-        <img src="/images/images.jpeg" alt="foto criança">
-        <h2 id="headerName"><%= crianca.nome %></h2>
-      </div>
-    </div>
 
-    <!-- Atividades -->
-    <div class="card" id="atividades">
-      <div class="card-header">
-        <h3>Atividades do Dia</h3>
-        <button class="add-btn" onclick="openAtividadeModal()">+ Adicionar</button>
-      </div>
-      <ul id="listaAtividades"></ul>
-    </div>
-
-    <!-- Cuidadores -->
-    <div class="card" id="cuidadores">
-      <div class="card-header">
-        <h3>Cuidador</h3>
-        <button class="add-btn" onclick="openEmailModal()">+ Adicionar</button>
-      </div>
-      <ul id="listaCuidadores"></ul>
+  <!-- Cabeçalho (foto + nome) — mantém os IDs -->
+  <div class="card header">
+    <div class="profile-info">
+      <img src="/images/images.jpeg" alt="foto criança">
+      <h2 id="headerName"><%= crianca.nome %></h2>
     </div>
   </div>
 
+  <!-- Abas -->
+  <div class="tabs tabs-crianca">
+    <!-- Cabeçalhos das abas -->
+    <input type="radio" id="tab-infos"  name="tab-crianca" class="tab-input" checked>
+    <label for="tab-infos"  class="tab-label">Informações</label>
 
-<!-- Partials: mantenha SOMENTE os que não duplicam IDs -->
+    <input type="radio" id="tab-agenda" name="tab-crianca" class="tab-input">
+    <label for="tab-agenda" class="tab-label">Agenda</label>
+
+    <!-- Painéis -->
+    <div class="tab-panels">
+      <!-- Painel: INFORMAÇÕES -->
+      <section id="panel-infos" class="tab-panel">
+        <div class="card">
+          <div class="card-header">
+            <h3>Informações da Criança</h3>
+            <button class="add-btn" onclick="openInfoModal()">+ Adicionar</button>
+          </div>
+          <!-- UL que o info.js preenche -->
+          <ul id="listaInfos"></ul>
+        </div>
+      </section>
+
+      <!-- Painel: AGENDA (Atividades + Cuidadores) -->
+      <section id="panel-agenda" class="tab-panel">
+        <div class="grid-two">
+          <!-- Atividades (mantém IDs) -->
+          <div class="card" id="atividades">
+            <div class="card-header">
+              <h3>Atividades do Dia</h3>
+              <button class="add-btn" onclick="openAtividadeModal()">+ Adicionar</button>
+            </div>
+            <ul id="listaAtividades"></ul>
+          </div>
+
+          <!-- Cuidadores (mantém IDs) -->
+          <div class="card" id="cuidadores">
+            <div class="card-header">
+              <h3>Cuidador</h3>
+              <button class="add-btn" onclick="openEmailModal()">+ Adicionar</button>
+            </div>
+            <ul id="listaCuidadores"></ul>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<!-- Partials e scripts permanecem exatamente como você enviou -->
 <%- include('partials/modal-alergias') %>
 <%- include('partials/modal-alert') %>
 <%- include('partials/modal-atividades') %>
 <%- include('partials/modal-email') %> 
 
-<!-- Scripts: defina o ID, depois auth, depois o crianca.js -->
-<script>
-  window.__ID_CRIANCA = "<%= crianca.idCrianca %>";
-</script>
-
-<!-- 1) auth primeiro -->
+<script> window.__ID_CRIANCA = "<%= crianca.idCrianca %>"; </script>
 <script src="/js/auth.js"></script>
-
-<!-- 2) utilitários (usa __ID_CRIANCA) -->
 <script src="/js/utils.js"></script>
-
-<!-- 3) módulos por feature -->
 <script src="/js/agenda.js" defer></script>
 <script src="/js/info.js" defer></script>
 <script src="/js/cuidadores.js" defer></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // se existir mais de 1 #listaInfos na página, remove os extras
+  const infosLists = document.querySelectorAll('#listaInfos');
+  if (infosLists.length > 1) {
+    infosLists.forEach((el, i) => { if (i > 0) el.closest('.card')?.remove(); });
+  }
+
+  // se existir algum card “Informações da Criança” fora das abas, remove
+  document.querySelectorAll('.main > .card .card-header h3')
+    .forEach(h3 => {
+      if (h3.textContent.trim() === 'Informações da Criança') {
+        const insideTabs = h3.closest('#panel-infos');
+        if (!insideTabs) h3.closest('.card')?.remove();
+      }
+    });
+});
+</script>

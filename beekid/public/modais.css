@@ -1,312 +1,153 @@
-/* ========================== */
-/* MODAIS */
-/* ========================== */
+/* ========= Base (reaproveitável para todos os modais) ========= */
+:root{
+  --brand:#351C75;        /* roxo principal */
+  --brand-2:#4b2a8a;      /* roxo variação */
+  --accent:#FFB33A;       /* amarelo */
+  --pink:#ea698b;         /* rosa */
+  --bd:#e5e7eb;
+  --muted:#6b7280;
+  --radius:16px;
+}
 
-.modal {
+.modal{
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, .4);
-  display: none;
-  align-items: center;
-  justify-content: center;
+  display: none; /* controlado pelo JS */
+  justify-content: center; /* centraliza horizontal */
+  align-items: center;     /* centraliza vertical */
+  background: rgba(17,24,39,.55);
   padding: 16px;
-  z-index: 999;
+  z-index: 1000;
 }
 
-.modal .box {
+.modal[aria-hidden="false"]{ display: grid; }
+
+.modal-card{
+  width: min(560px, 92vw);
   background: #fff;
-  max-width: 560px;
-  width: 100%;
-  border-radius: 14px;
   border: 1px solid var(--bd);
+  border-radius: var(--radius);
+  box-shadow: 0 24px 80px rgba(0,0,0,.16);
+  overflow: hidden;
 }
+.modal-card.md{ width: min(640px, 92vw); } /* tamanho médio opcional */
 
-.box .head {
-  padding: 14px 18px;
+.modal-head{
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 14px 16px;
   border-bottom: 1px solid var(--bd);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+}
+.modal-head h2{
+  margin:0; font-size: 20px; font-weight: 900; color: var(--brand);
+}
+.modal-close{
+  background: transparent; border: 0; font-size: 28px; line-height: 1;
+  cursor: pointer; color:#6b6f76; padding: 0 8px; border-radius: 10px;
+}
+.modal-close:hover{ color: var(--brand); background: #f3f4f6; }
+
+.modal-body{
+  padding: 16px;
+  display: grid;
+  gap: 14px;
 }
 
-.box .head h3 {
-  margin: 0;
-  font-size: 18px;
+.modal-foot{
+  display:flex; gap: 10px; justify-content:flex-end;
+  padding: 12px 16px;
+  border-top: 1px solid var(--bd);
 }
 
-.box .content {
-  padding: 18px;
+/* ========= Form padrão do modal ========= */
+.form-row label{
+  display:block; font-weight: 800; margin-bottom: 6px; color:#1f2240;
 }
-
-/* Ajuste específico para o modal de endereço */
-#modalEndereco .box {
-  max-width: 700px;
-  padding: 28px;
-}
-
-#modalEndereco .content {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-#modalEndereco label {
-  margin: 4px 0;
-}
-
-#modalEndereco input {
-  padding: 10px 12px;
-  font-size: 15px;
-}
-
-#modalEndereco .row,
-#modalEndereco .row-3 {
-  gap: 30px;
-}
-
-/* ========================== */
-/* MODAL ATIVIDADES */
-/* ========================== */
-.modal-content {
-  position: relative;
-  background: var(--card);
+.form-row select,
+.form-row textarea{
+  width: 100%;
+  padding: 12px 12px;
   border: 1px solid var(--bd);
-  border-radius: var(--radius);
-  padding: 24px;
-  max-width: 500px;
-  width: 100%;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin: auto;
-}
-
-.modal-content h2 {
-  margin: 0 0 10px;
-  font-size: 20px;
-  color: var(--text);
-}
-
-.modal-content label {
-  font-weight: 600;
-  margin: 6px 0 4px;
-}
-
-.modal-content input,
-.modal-content textarea,
-.modal-content select {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid var(--bd);
-  border-radius: 10px;
-  background: #fff;
-  font-size: 14px;
-}
-
-.modal-content textarea {
-  min-height: 80px;
-  resize: vertical;
-}
-
-.modal-content .actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-/* Botões dentro dos modais */
-.add-btn {
-  background: var(--brand);
-  color: #fff;
-  border: none;
-  padding: 8px 14px;
-  border-radius: var(--radius);
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.add-btn:hover {
-  background: var(--brand-2);
-}
-
-.close-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: transparent;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: #666;
-  transition: 0.3s;
-}
-
-.close-btn:hover {
-  color: #e74c3c;
-  transform: scale(1.1);
-}
-
-/* Botão Salvar */
-#salvarAtividadeBtn {
-  background: #7a3fc1;
-  color: #fff;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.3s, transform 0.2s;
-  width: 100%;
-}
-
-#salvarAtividadeBtn:hover {
-  background: #652fa6;
-  transform: scale(1.02);
-}
-
-/* Botão Cancelar */
-#cancelarAtividadeBtn {
-  background: #f3f4f6;
-  color: #444;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.3s, transform 0.2s;
-  width: 100%;
-}
-
-#cancelarAtividadeBtn:hover {
-  background: #e5e7eb;
-  transform: scale(1.02);
-}
-
-/* Ajuste só para o modal de Atividade */
-#atividadeModal .modal-content {
-  max-width: 380px;
-  max-height: 70vh;
-  overflow-y: auto;
-  padding: 20px;
   border-radius: 12px;
-}
-
-/* Scroll bonito */
-#atividadeModal .modal-content::-webkit-scrollbar {
-  width: 8px;
-}
-#atividadeModal .modal-content::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 4px;
-}
-#atividadeModal .modal-content::-webkit-scrollbar-thumb:hover {
-  background: #aaa;
-}
-
-
-/* ============================= */
-/* LISTAS DE ITENS (atividades, infos, cuidadores) */
-/* ============================= */
-#listaAtividades li,
-#listaInfos li,
-#listaCuidadores li {
-  list-style: none;
-  border: 1px solid var(--bd);
-  border-radius: 10px;
-  padding: 12px;
-  margin-bottom: 12px;
   background: #fff;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  white-space: normal;
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+  font: inherit;
+  color: #111827;
+}
+.form-row textarea{ resize: vertical; min-height: 120px; }
+.form-row select:focus,
+.form-row textarea:focus{
+  border-color: #d7cef3;
+  box-shadow: 0 0 0 3px rgba(53,28,117,.15);
 }
 
-/* Texto principal do item */
-#listaAtividades li strong,
-#listaInfos li strong,
-#listaCuidadores li strong {
-  color: var(--brand);
-  font-size: 14px;
-}
-
-/* Descrição */
-#listaAtividades li p,
-#listaInfos li p,
-#listaCuidadores li p {
-  margin: 4px 0;
-  color: #333;
-  font-size: 14px;
-  line-height: 1.4;
-  word-break: break-word;
-}
-
-/* ============================= */
-/* AÇÕES (Editar / Excluir) */
-/* ============================= */
-.info-actions,
-.atividade-actions,
-.cuidador-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 6px;
-}
-
-.info-actions button,
-.atividade-actions button,
-.cuidador-actions button {
-  padding: 6px 12px;
-  font-size: 13px;
-  font-weight: 600;
-  border-radius: 8px;
-  border: 1px solid var(--bd);
-  background: #fff;
-  color: #333;
+/* ========= Botões (seguem seu padrão) ========= */
+.btn{
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid transparent;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s;
+  font-weight: 800;
 }
-
-/* Hover padrão */
-.info-actions button:hover,
-.atividade-actions button:hover,
-.cuidador-actions button:hover {
-  background: #f3f4f6;
-}
-
-/* Botão de Editar */
-.info-actions button:first-child,
-.atividade-actions button:first-child,
-.cuidador-actions button:first-child {
-  border-color: var(--brand);
-  color: var(--brand);
-}
-
-.info-actions button:first-child:hover,
-.atividade-actions button:first-child:hover,
-.cuidador-actions button:first-child:hover {
-  background: var(--brand);
+.btn.primary{
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
   color: #fff;
 }
+.btn.primary:hover{ filter: brightness(1.05); }
+.btn.ghost{
+  background: #fff;
+  border: 1px solid var(--bd);
+  color: #1f2240;
+}
+.btn.ghost:hover{ background: #f9fafb; }
 
-/* Botão de Excluir */
-.info-actions button:last-child,
-.atividade-actions button:last-child,
-.cuidador-actions button:last-child {
-  border-color: #dc2626;
-  color: #dc2626;
+/* ========= Lista de infos (opcional: deixa bonito no card) ========= */
+#listaInfos{
+  list-style: none;
+  margin: 0; padding: 12px 16px;
+  display: grid; gap: 10px;
+}
+#listaInfos li{
+  border: 1px solid var(--bd);
+  border-radius: 12px;
+  padding: 12px;
+  background: #fff;
+  display: grid; gap: 8px;
+  position: relative;
 }
 
-.info-actions button:last-child:hover,
-.atividade-actions button:last-child:hover,
-.cuidador-actions button:last-child:hover {
-  background: #dc2626;
-  color: #fff;
+/* filete colorido conforme tipo (reaproveita data-tipo setado no JS) */
+#listaInfos li::before{
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px; border-top-left-radius: 12px; border-bottom-left-radius: 12px;
+  background: #e5e7eb;
 }
+#listaInfos li[data-tipo="alergias"]::before{ background: var(--pink); }
+#listaInfos li[data-tipo="medicamento"]::before{ background: #22c55e; }
+#listaInfos li[data-tipo="escola"]::before{ background: var(--accent); }
+#listaInfos li[data-tipo="outros"]::before{ background: var(--brand); }
+
+#listaInfos .info-top{
+  display: flex; align-items: center; gap: 10px; justify-content: space-between;
+}
+#listaInfos .badge-info{
+  font-size: 12px; font-weight: 800;
+  padding: 4px 8px; border-radius: 999px; border: 1px solid transparent;
+}
+#listaInfos .badge-info.alergias{ background: rgba(234,105,139,.12); color:#9f1239; border-color: rgba(234,105,139,.32); }
+#listaInfos .badge-info.medicamento{ background: rgba(34,197,94,.12); color:#166534; border-color: rgba(34,197,94,.32); }
+#listaInfos .badge-info.escola{ background: rgba(255,179,58,.14); color:#7a4b00; border-color: rgba(255,179,58,.40); }
+#listaInfos .badge-info.outros{ background: rgba(53,28,117,.10); color:#2b165f; border-color: rgba(53,28,117,.25); }
+
+#listaInfos .info-title{ font-weight: 800; color:#1f2937; }
+#listaInfos .info-desc{ color:#4b5563; white-space: pre-wrap; }
+
+#listaInfos .info-actions{
+  display:flex; gap: 8px; justify-content: flex-end;
+}
+#listaInfos .info-actions button{
+  padding: 6px 10px; border-radius: 10px; border: 1px solid var(--bd); background:#fff; cursor:pointer;
+}
+#listaInfos .info-actions button:hover{ background:#f3f4f6; }

@@ -144,14 +144,41 @@ async function salvarEndereco(){
   await loadEnderecos();
 }
 
+// Confirmação via modal-confirm-template (fallback para window.confirm)
+async function askConfirm(message, opts = {}) {
+  if (typeof showConfirm === 'function') {
+    try {
+      const ok = await showConfirm({
+        title: opts.title || 'Confirmar ação',
+        message,
+        confirmText: opts.confirmText || 'Confirmar',
+        cancelText: opts.cancelText || 'Cancelar',
+        variant: opts.variant || 'danger', // deixa o botão de confirmação em vermelho
+      });
+      return !!ok;
+    } catch {
+      return false;
+    }
+  }
+  // Se o template ainda não estiver carregado, usa confirm() mesmo
+  return window.confirm(message);
+}
+
+
 async function excluirEndereco(id){
-  if(!confirm('Excluir este endereço?')) return;
+  const ok = await askConfirm(
+    'Excluir este endereço?',
+    { title: 'Excluir endereço', confirmText: 'Excluir', cancelText: 'Cancelar', variant: 'danger' }
+  );
+  if(!ok) return;
+
   const r = await fetch(`/api/enderecos/${id}`,{ method:'DELETE', headers:{...authHeaders()} });
   const data = await r.json().catch(()=> ({}));
   if(!r.ok){ toast(data?.message || data?.error || 'Erro ao excluir'); return; }
   toast('Endereço excluído');
   await loadEnderecos();
 }
+
 
 // ===== Bind
 document.addEventListener('DOMContentLoaded', async ()=>{

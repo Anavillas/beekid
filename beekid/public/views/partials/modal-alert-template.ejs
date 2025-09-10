@@ -1,0 +1,33 @@
+<!-- Modal de mensagens -->
+<div class="modal" id="messageModal" aria-hidden="true">
+  <div class="modal-card small">
+    <div class="modal-head">
+      <h2 id="messageTitle">Mensagem</h2>
+      <button class="modal-close" type="button" aria-label="Fechar" onclick="closeModal('messageModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p id="messageText"></p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn primary" type="button" onclick="closeModal('messageModal')">OK</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Função utilitária para exibir mensagens
+  function showMessage(title, text, type = 'success') {
+    const modal = document.getElementById('messageModal');
+    const titleEl = document.getElementById('messageTitle');
+    const textEl  = document.getElementById('messageText');
+
+    // Limpa classes de estado
+    modal.classList.remove('message-success','message-error');
+    modal.classList.add(type === 'error' ? 'message-error' : 'message-success');
+
+    titleEl.textContent = title;
+    textEl.textContent  = text;
+
+    openModal('messageModal');
+  }
+</script>

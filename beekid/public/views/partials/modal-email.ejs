@@ -1,10 +1,33 @@
-<div class="modal" id="emailModal">
-  <div class="modal-content">
-    <button class="close-btn" onclick="closeModal('emailModal')">&times;</button>
-    <h2>Adicionar Cuidador</h2>
-    <hr>
-    <label for="emailCuidadorInput">Email do Cuidador:</label>
-    <input type="email" id="emailCuidadorInput" placeholder="E-mail do cuidador" required>
-    <button class="add-btn" onclick="associarCuidador()">Associar</button>
+<!-- Modal: Adicionar Cuidador -->
+<div class="modal" id="emailModal" aria-hidden="true" role="dialog" aria-labelledby="emailModalTitle">
+  <div class="modal-card sm" role="document">
+    <div class="modal-head">
+      <h2 id="emailModalTitle">Adicionar Cuidador</h2>
+      <button class="modal-close" type="button" aria-label="Fechar" onclick="closeModal('emailModal')">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <p class="helper-text">Informe o e-mail do cuidador para enviar associá-lo.</p>
+
+      <div class="form-row">
+        <label for="emailCuidadorInput">E-mail do cuidador</label>
+        <div class="input-group">
+          <i class="bx bx-envelope"></i>
+          <input
+            type="email"
+            id="emailCuidadorInput"
+            placeholder="exemplo@dominio.com"
+            required
+            autocomplete="email"
+            inputmode="email"
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn ghost" type="button" onclick="closeModal('emailModal')">Cancelar</button>
+      <button class="btn primary" type="button" onclick="associarCuidador()">Associar</button>
+    </div>
   </div>
 </div>

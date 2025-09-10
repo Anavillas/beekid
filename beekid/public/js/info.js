@@ -11,14 +11,24 @@ async function openInfoModal(idInfo = null) {
   document.getElementById('tipoInfoSelect').value = 'alergias';
   document.getElementById('infoDescricaoInput').value = '';
 
-  if (idInfo) {
+  if (idInfo != null && idInfo !== '') {
     try {
-      const resp = await fetch(`${INFO_BASE}/${idInfo}`, { headers: { ...authHeaders() } });
-      if (!resp.ok) throw new Error('Não encontrado');
-      const info = await resp.json();
+      // 🔁 Em vez de GET /api/info/:id (que dá 404),
+      // buscamos a lista da criança e filtramos pelo id:
+      const listResp = await fetch(`${INFO_BASE}/crianca/${idCrianca}`, { headers: { ...authHeaders() } });
+      if (!listResp.ok) throw new Error('Falha ao carregar informações da criança.');
+      const infos = await listResp.json();
+      const info = Array.isArray(infos)
+        ? infos.find(i => String(i.idInfo_crianca) === String(idInfo))
+        : null;
 
-      document.getElementById('infoIdInput').value = info.idInfo_crianca;
-      document.getElementById('tipoInfoSelect').value = info.tipo_info;
+      if (!info) {
+        showAlert('Essa informação não existe mais (talvez foi excluída).');
+        return;
+      }
+
+      document.getElementById('infoIdInput').value = info.idInfo_crianca ?? '';
+      document.getElementById('tipoInfoSelect').value = info.tipo_info || 'alergias';
       document.getElementById('infoDescricaoInput').value = info.descricao || '';
 
       title.textContent = 'Editar informação';
@@ -48,26 +58,64 @@ async function salvarInfo() {
     const tipo_info  = document.getElementById('tipoInfoSelect').value; // 'alergias' | 'medicamento' | 'outros'
     const descricao  = document.getElementById('infoDescricaoInput').value.trim();
 
-    if (!descricao) { showAlert('Descrição é obrigatória.'); return; }
-
-    const payload = { tipo_info, descricao, id_crianca: idCrianca };
-    const method  = idInfo ? 'PUT' : 'POST';
-    const url     = idInfo ? `${INFO_BASE}/${idInfo}` : INFO_BASE;
-
-    const resp = await fetch(url, {
-      method,
-      headers: { 'Content-Type': 'application/json', ...authHeaders() },
-      body: JSON.stringify(payload)
-    });
-
-    const data = await resp.json().catch(() => ({}));
-    if (!resp.ok) {
-      console.error('Salvar info falhou:', resp.status, data);
-      showAlert(data?.message || data?.error || 'Erro ao salvar informação.');
+    if (!descricao) {
+      showAlert('Descrição é obrigatória.');
       return;
     }
 
-    showAlert(idInfo ? 'Informação atualizada!' : 'Informação adicionada!');
+    const payloadBase = { tipo_info, descricao, id_crianca: idCrianca };
+
+    let resp, data;
+
+    if (idInfo) {
+      // 1) Tenta PUT /api/info/:id
+      const urlPut = `${INFO_BASE}/${encodeURIComponent(idInfo)}`;
+      resp = await fetch(urlPut, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', ...authHeaders() },
+        body: JSON.stringify(payloadBase),
+      });
+
+      // 2) Se o backend não tiver a rota (404), tenta POST /api/info (fallback "update")
+      if (resp.status === 404) {
+        const urlPost = INFO_BASE; // /api/info
+        const payloadUpdate = { ...payloadBase, idInfo_crianca: idInfo }; // o backend pode usar este id para atualizar
+        resp = await fetch(urlPost, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...authHeaders() },
+          body: JSON.stringify(payloadUpdate),
+        });
+      }
+
+      data = await resp.json().catch(() => ({}));
+
+      if (!resp.ok) {
+        console.error('Salvar info falhou (update):', resp.status, data);
+        showAlert(data?.message || data?.error || 'Erro ao salvar informação.');
+        return;
+      }
+
+      showAlert('Informação atualizada!');
+    } else {
+      // Criar
+      const urlPost = INFO_BASE; // /api/info
+      resp = await fetch(urlPost, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...authHeaders() },
+        body: JSON.stringify(payloadBase),
+      });
+
+      data = await resp.json().catch(() => ({}));
+
+      if (!resp.ok) {
+        console.error('Salvar info falhou (create):', resp.status, data);
+        showAlert(data?.message || data?.error || 'Erro ao salvar informação.');
+        return;
+      }
+
+      showAlert('Informação adicionada!');
+    }
+
     closeModal('infoModal');
     carregarInfos();
   } catch (e) {
@@ -78,6 +126,7 @@ async function salvarInfo() {
     if (btn) btn.disabled = false;
   }
 }
+
 
 async function carregarInfos() {
   try {
@@ -123,7 +172,7 @@ async function carregarInfos() {
 async function deletarInfo(idInfo) {
   if (!confirm('Deseja excluir esta informação?')) return;
   try {
-    const resp = await fetch(`${INFO_BASE}/${idInfo}`, {
+    const resp = await fetch(`${INFO_BASE}/${encodeURIComponent(idInfo)}`, {
       method: 'DELETE',
       headers: { ...authHeaders() }
     });

@@ -1,27 +1,42 @@
-<div class="modal" id="atividadeModal">
-    <div class="modal-content">
-        <!-- Botão de Fechar -->
-        <button class="close-btn" onclick="closeModal('atividadeModal')">&times;</button>
-
-        <h2 id="modalAtividadeTitle">Adicionar Atividade</h2>
-        <input type="hidden" id="atividadeIdInput">
-
-        <label for="horario">Horário:</label>
-        <input type="text" id="horarioInput" placeholder="Ex: 14:00">
-        
-        <label for="titulo">Título:</label>
-        <input type="text" id="tituloInput" placeholder="Título da atividade">
-        
-        <label for="descricao">Descrição:</label>
-        <textarea id="descricaoInput" placeholder="Descrição da atividade"></textarea>
-        
-        <label for="status">Status:</label>
-        <select id="statusInput">
-            <option value="pendente">Pendente</option>
-            <option value="concluido">Concluído</option>
-        </select>
-        
-        <button id="salvarAtividadeBtn">Salvar</button>
-      <button id="cancelarAtividadeBtn" onclick="closeModal('atividadeModal')">Cancelar</button>
+<!-- Modal: Atividade -->
+<div class="modal" id="atividadeModal" aria-hidden="true" role="dialog" aria-labelledby="modalAtividadeTitle">
+  <div class="modal-card md" role="document">
+    <div class="modal-head">
+      <h2 id="modalAtividadeTitle">Adicionar Atividade</h2>
+      <button class="modal-close" type="button" aria-label="Fechar" onclick="closeModal('atividadeModal')">&times;</button>
     </div>
+
+    <div class="modal-body">
+      <input type="hidden" id="atividadeIdInput">
+
+      <div class="form-row">
+        <label for="horarioInput">Horário</label>
+        <input type="time" id="horarioInput" step="60">
+    </div>
+
+
+      <div class="form-row">
+        <label for="tituloInput">Título</label>
+        <input type="text" id="tituloInput" placeholder="Título da atividade">
+      </div>
+
+      <div class="form-row">
+        <label for="descricaoInput">Descrição</label>
+        <textarea id="descricaoInput" placeholder="Descrição da atividade" rows="4"></textarea>
+      </div>
+
+      <div class="form-row">
+        <label for="statusInput">Status</label>
+        <select id="statusInput">
+          <option value="pendente">Pendente</option>
+          <option value="concluido">Concluído</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn ghost" id="cancelarAtividadeBtn" type="button" onclick="closeModal('atividadeModal')">Cancelar</button>
+      <button class="btn primary" id="salvarAtividadeBtn" type="button">Salvar</button>
+    </div>
+  </div>
 </div>

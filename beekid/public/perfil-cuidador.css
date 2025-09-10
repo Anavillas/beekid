@@ -1,0 +1,179 @@
+/* ============================= */
+/* VARS / TEMA                   */
+/* ============================= */
+:root{
+  --roxo: #351C75;
+  --roxo-600:#2b165f;
+  --roxo-050:#efe9fa;
+  --amarelo:#FFB33A;
+  --rosa:#ea698b;
+
+  --bg:#f5f5fc;
+  --card:#fff;
+  --bd:#e5e7eb;
+  --muted:#6b7280;
+  --text:#1f2240;
+  --radius:16px;
+}
+
+/* ============================= */
+/* LAYOUT BÁSICO                 */
+/* ============================= */
+.perfil-page{
+  max-width: 1100px;
+  margin: 24px auto;
+  padding: 0 16px;
+  color: var(--text);
+  font: 16px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Arial;
+}
+.topbar{
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom: 10px;
+}
+.link-back{
+  text-decoration:none; font-weight:800;
+  color: var(--roxo);
+  padding: 8px 10px; border-radius: 10px;
+}
+.link-back:hover{ background: var(--roxo-050); }
+.status{ margin: 16px 0; color: var(--muted); }
+.empty{ margin: 16px 0; color: var(--muted); text-align:center; }
+
+/* ============================= */
+/* CARD PRINCIPAL                */
+/* ============================= */
+.perfil-card{
+  background: var(--card);
+  border: 1px solid var(--bd);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 24px rgba(53,28,117,.06);
+  padding: 18px;
+  display: grid;
+  gap: 18px;
+}
+
+/* header (avatar + nome) */
+.perfil-card__header{
+  display:flex; align-items:center; gap:16px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed #eadffb;
+}
+.perfil-avatar{
+  width: 72px; height: 72px; border-radius: 50%;
+  background: #f3f4f6; display:grid; place-items:center; overflow:hidden;
+  border: 3px solid var(--roxo-050);
+  box-shadow: 0 3px 10px rgba(0,0,0,.05);
+}
+.perfil-avatar img{ width:100%; height:100%; object-fit:cover; }
+.avatar__initials{ font-size: 1.15rem; font-weight: 900; color: #6b6f76; }
+.name{ margin:0; font-size: 26px; font-weight: 900; color: var(--roxo); }
+.muted{ color: var(--muted); }
+
+/* ============================= */
+/* SEÇÕES                        */
+/* ============================= */
+.section{
+  background: #fff;
+  border: 1px solid var(--bd);
+  border-radius: 14px;
+  box-shadow: 0 6px 20px rgba(0,0,0,.04);
+  padding: 12px 12px 6px;
+}
+.section h2{
+  margin: 4px 6px 10px;
+  font-size: 18px; font-weight: 900; color: var(--roxo);
+  position: relative;
+}
+.section h2::after{
+  content: ""; display:block; height: 3px; width: 42px;
+  border-radius: 999px; margin-top: 6px;
+  background: linear-gradient(90deg, var(--roxo), #5c2ac7);
+}
+
+/* ============================= */
+/* DADOS (dl key/value)          */
+/* ============================= */
+.kv{
+  display:grid; gap: .5rem; padding: 0 6px 10px;
+}
+.kv > div{
+  display:grid; grid-template-columns: 160px 1fr; gap: .75rem;
+  padding: 10px 8px; border-radius: 12px;
+  border: 1px solid #eef0f4; background: #fff;
+}
+.kv dt{ font-weight: 800; color:#374151; }
+.kv dd{ margin:0; color:#111827; }
+@media (max-width: 640px){
+  .kv > div{ grid-template-columns: 1fr; }
+}
+
+/* ============================= */
+/* LISTAS GENERICAS              */
+/* ============================= */
+.list{ list-style: none; padding: 0; margin: 0; }
+
+/* Itens genéricos (endereços) como cartões simples */
+#enderecos li{
+  margin: 10px 8px; padding: 12px;
+  border: 1px solid #ececf3; border-radius: 12px; background:#fff;
+  box-shadow: 0 4px 14px rgba(53,28,117,.06);
+  color:#384152;
+}
+
+/* ============================= */
+/* CRIANÇAS – CARD ESTILIZADO    */
+/* ============================= */
+/* Funciona com <li> simples (texto).
+   Se você passar data-iniciais="AG" no <li>, ele usa as iniciais no avatar. */
+#criancas{
+  display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px;
+  padding: 6px 6px 12px;
+}
+@media (max-width: 640px){ #criancas{ grid-template-columns: 1fr; } }
+
+#criancas li{
+  position: relative;
+  display:flex; align-items:center; gap: 12px;
+  margin: 0; padding: 12px 12px;
+  border:1px solid #ececf3; border-radius: 14px; background:#fff;
+  box-shadow: 0 6px 18px rgba(53,28,117,.07);
+}
+
+/* avatar "bolinha" à esquerda */
+#criancas li::before{
+  content: attr(data-iniciais);
+  width: 36px; height: 36px; min-width:36px;
+  display:grid; place-items:center;
+  border-radius:50%;
+  background: var(--roxo-050);
+  color: var(--roxo-600);
+  font-weight: 900; font-size: 12px;
+  border: 2px solid #ede7fb;
+}
+/* quando não houver data-iniciais, mostra um emoji padrão */
+#criancas li:not([data-iniciais])::before{ content: "👶"; font-size: 16px; }
+
+/* nome + detalhe (quando o li tiver só texto, isso ainda fica bom) */
+#criancas li .child-main{ display:grid; gap: 2px; min-width: 0; }
+#criancas li .child-name{
+  font-weight: 900; color: #1f2240; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+#criancas li .child-meta{ color:#667085; font-size: 13px; }
+
+/* botão “ver perfil” (se quiser usar no futuro) */
+#criancas li .child-actions{ margin-left:auto; }
+#criancas li .btn{
+  padding: 8px 12px; border-radius: 999px; border:1px solid #e0e7ff;
+  background:#eef2ff; color:#3730a3; font-weight:800;
+}
+#criancas li .btn:hover{ filter: brightness(1.03); }
+
+/* ============================= */
+/* ACESSIBILIDADE                */
+/* ============================= */
+.link-back:focus-visible,
+.perfil-card a:focus-visible{
+  outline: 3px solid rgba(234,105,139,.35);
+  outline-offset: 2px;
+  border-radius: 10px;
+}

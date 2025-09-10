@@ -1,11 +1,36 @@
-<div class="modal" id="modalAdicionarCrianca">
-  <div class="modal-content">
-    <h2>Adicionar Nova Criança</h2>
-    <input type="text" id="nomeCriancaInput" placeholder="Nome da Criança">
-    <input type="text" id="cpfCriancaInput" placeholder="CPF da Criança">
-    <input type="date" id="dataNascimentoCriancaInput">
-    
-    <button class="add-btn" onclick="adicionarNovaCrianca()">Salvar</button>
-    <button class="add-btn" onclick="closeModal('modalAdicionarCrianca')">Cancelar</button>
+<div class="modal" id="modalAdicionarCrianca" aria-hidden="true" role="dialog" aria-labelledby="tituloModalCrianca">
+  <div class="modal-card" role="document">
+    <div class="modal-head">
+      <h2 id="tituloModalCrianca">Adicionar Nova Criança</h2>
+      <button class="modal-close" type="button" aria-label="Fechar" onclick="closeModal('modalAdicionarCrianca')">
+        &times;
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-row">
+        <label for="nomeCriancaInput">Nome da Criança</label>
+        <input type="text" id="nomeCriancaInput" placeholder="Ex.: João Gabriel" autocomplete="off" autofocus>
+        <small class="field-error" id="errNome"></small>
+      </div>
+
+      <div class="form-row">
+        <label for="cpfCriancaInput">CPF da Criança</label>
+        <input type="text" id="cpfCriancaInput" placeholder="000.000.000-00" inputmode="numeric" maxlength="14">
+        <small class="field-error" id="errCpf"></small>
+      </div>
+
+      <div class="form-row">
+        <label for="dataNascimentoCriancaInput">Data de Nascimento</label>
+        <input type="date" id="dataNascimentoCriancaInput">
+        <small class="field-error" id="errData"></small>
+      </div>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn ghost" type="button" onclick="closeModal('modalAdicionarCrianca')">Cancelar</button>
+      <button class="btn primary" type="button" onclick="adicionarNovaCrianca()">Salvar</button>
+    </div>
   </div>
 </div>
+

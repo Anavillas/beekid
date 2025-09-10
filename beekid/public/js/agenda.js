@@ -100,18 +100,32 @@ async function carregarAtividadesDoDia() {
     }
 
     atividades.forEach((tarefa) => {
-      const li = document.createElement('li');
-      li.innerHTML = `
-        <div class="atividade-info">
-          <strong>[${tarefa.horario}] ${tarefa.titulo}</strong>
-          <p>${tarefa.descricao ?? ''} (${tarefa.status_tarefa})</p>
+      const status = (tarefa.status_tarefa || 'pendente').toLowerCase();
+    const statusClass =
+      status.includes('concl') ? 'concluida' :
+      status.includes('cancel') ? 'cancelada' : 'pendente';
+
+    const li = document.createElement('li');
+    li.className = 'task';
+    li.setAttribute('data-status', statusClass);
+    li.innerHTML = `
+      <div class="task-main">
+        <div class="task-top">
+          <span class="time">${tarefa.horario || ''}</span>
+          <span class="badge ${statusClass}">
+            ${statusClass === 'concluida' ? 'Concluída' :
+              statusClass === 'cancelada' ? 'Cancelada' : 'Pendente'}
+          </span>
         </div>
-        <div class="atividade-actions">
-          <button onclick="openAtividadeModal(${tarefa.idAgenda})">Editar</button>
-          <button onclick="deletarAtividade(${tarefa.idAgenda})">Excluir</button>
-        </div>
-      `;
-      lista.appendChild(li);
+        <div class="title">${tarefa.titulo || ''}</div>
+        <p class="desc">${tarefa.descricao ?? ''}</p>
+      </div>
+      <div class="atividade-actions">
+        <button onclick="openAtividadeModal(${tarefa.idAgenda})">Editar</button>
+        <button onclick="deletarAtividade(${tarefa.idAgenda})">Excluir</button>
+      </div>
+    `;
+lista.appendChild(li);
     });
   } catch (err) {
     console.error('Erro ao carregar atividades:', err);
@@ -119,8 +133,32 @@ async function carregarAtividadesDoDia() {
   }
 }
 
+async function askConfirm(message, opts = {}) {
+  if (typeof showConfirm === 'function') {
+    try {
+      const ok = await showConfirm({
+        title: opts.title || 'Confirmar ação',
+        message,
+        confirmText: opts.confirmText || 'Confirmar',
+        cancelText: opts.cancelText || 'Cancelar',
+        variant: opts.variant || 'danger', // usa o estilo "perigoso" para exclusão
+      });
+      return !!ok;
+    } catch (_) {
+      return false;
+    }
+  }
+  // fallback se o modal não estiver carregado
+  return window.confirm(message);
+}
+
 async function deletarAtividade(id) {
-  if (!confirm('Tem certeza que deseja excluir esta atividade?')) return;
+  const ok = await askConfirm(
+    'Tem certeza que deseja excluir esta atividade?',
+    { title: 'Excluir atividade', confirmText: 'Excluir', cancelText: 'Cancelar', variant: 'danger' }
+  );
+  if (!ok) return;
+
   try {
     const response = await fetch(`/api/agenda/${id}`, {
       method: 'DELETE',

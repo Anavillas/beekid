@@ -6,19 +6,34 @@
     <p>Clique no botão abaixo para adicionar uma nova criança.</p>
   </div>
 
-  <!-- Seção de Responsável -->
-  <div class="profiles-section">
-    <h2>Sou Responsável</h2>
-    <div class="profiles" id="responsavel-container">
-      <!-- Cards vão ser renderizados aqui -->
-    </div>
-  </div>
+  <!-- Abas -->
+  <div class="tabs">
+    <!-- Cabeçalho das abas (puro CSS, sem JS extra) -->
+    <input type="radio" id="tab-responsavel" name="perfil-tab" class="tab-input" checked>
+    <label for="tab-responsavel" class="tab-label">Sou responsável</label>
 
-  <!-- Seção de Cuidador -->
-  <div class="profiles-section">
-    <h2>Sou Cuidador</h2>
-    <div class="profiles" id="cuidador-container">
-      <!-- Cards vão ser renderizados aqui -->
+    <input type="radio" id="tab-cuidador" name="perfil-tab" class="tab-input">
+    <label for="tab-cuidador" class="tab-label">Sou cuidador</label>
+
+    <!-- Painéis -->
+    <div class="tab-panels">
+      <!-- Painel Responsável -->
+      <section id="panel-responsavel" class="tab-panel">
+        <div class="profiles-section">
+          <div class="profiles" id="responsavel-container">
+            <!-- Cards de responsável renderizados via JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Painel Cuidador -->
+      <section id="panel-cuidador" class="tab-panel">
+        <div class="profiles-section">
+          <div class="profiles" id="cuidador-container">
+            <!-- Cards de cuidador renderizados via JS -->
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 </div>

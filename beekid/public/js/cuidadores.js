@@ -14,7 +14,11 @@ async function associarCuidador() {
   const idCrianca = window.__ID_CRIANCA; // vem do EJS
   const email = (document.getElementById('emailCuidadorInput')?.value || '').trim();
   if (!email) {
-    alert("Por favor, digite um e-mail.");
+    if (typeof showMessage === 'function') {
+      showMessage('Atenção', 'Por favor, digite um e-mail.', 'error');
+    } else {
+      alert('Por favor, digite um e-mail.');
+    }
     return;
   }
 
@@ -30,17 +34,30 @@ async function associarCuidador() {
 
     const result = await resp.json().catch(() => ({}));
     if (resp.ok) {
-      alert(result.message || 'Cuidador associado com sucesso!');
+      if (typeof showMessage === 'function') {
+        showMessage('Sucesso', result.message || 'Cuidador associado com sucesso!', 'success');
+      } else {
+        alert(result.message || 'Cuidador associado com sucesso!');
+      }
       const input = document.getElementById('emailCuidadorInput');
       if (input) input.value = '';
       if (typeof closeModal === 'function') closeModal('emailModal');
       if (typeof carregarCuidadores === 'function') carregarCuidadores();
     } else {
-      alert("Erro: " + (result.message || result.error || 'Não foi possível associar.'));
+      const msg = "Erro: " + (result.message || result.error || 'Não foi possível associar.');
+      if (typeof showMessage === 'function') {
+        showMessage('Erro', msg, 'error');
+      } else {
+        alert(msg);
+      }
     }
   } catch (error) {
     console.error(error);
-    alert("Erro ao conectar com o servidor.");
+    if (typeof showMessage === 'function') {
+      showMessage('Erro', 'Erro ao conectar com o servidor.', 'error');
+    } else {
+      alert('Erro ao conectar com o servidor.');
+    }
   }
 }
 
@@ -85,12 +102,21 @@ async function carregarCuidadores() {
     });
   } catch (e) {
     console.error(e);
-    alert("Erro ao carregar cuidadores.");
+    if (typeof showMessage === 'function') {
+      showMessage('Erro', 'Erro ao carregar cuidadores.', 'error');
+    } else {
+      alert('Erro ao carregar cuidadores.');
+    }
   }
 }
 
 async function desassociarCuidador(idCuidador, idCrianca) {
-  if (!confirm("Tem certeza que deseja remover este cuidador?")) return;
+  // usa o modal-confirm-template; se não existir, cai no confirm nativo
+  const ok = await (typeof showConfirm === 'function'
+    ? showConfirm('Remover cuidador', 'Tem certeza que deseja remover este cuidador?', 'Remover', 'Cancelar')
+    : Promise.resolve(confirm('Tem certeza que deseja remover este cuidador?'))
+  );
+  if (!ok) return;
 
   try {
     const resp = await fetch(`/api/criancas/${idCrianca}/cuidadores/${idCuidador}`, {
@@ -104,17 +130,29 @@ async function desassociarCuidador(idCuidador, idCrianca) {
 
     const result = await resp.json().catch(() => ({}));
     if (resp.ok) {
-      alert(result.message || 'Cuidador removido com sucesso!');
+      if (typeof showMessage === 'function') {
+        showMessage('Sucesso', result.message || 'Cuidador removido com sucesso!', 'success');
+      } else {
+        alert(result.message || 'Cuidador removido com sucesso!');
+      }
       carregarCuidadores(); // recarrega a lista
     } else {
-      alert("Erro: " + (result.message || result.error || 'Não foi possível remover.'));
+      const msg = 'Erro: ' + (result.message || result.error || 'Não foi possível remover.');
+      if (typeof showMessage === 'function') {
+        showMessage('Erro', msg, 'error');
+      } else {
+        alert(msg);
+      }
     }
   } catch (e) {
     console.error(e);
-    alert('Erro ao conectar com o servidor.');
+    if (typeof showMessage === 'function') {
+      showMessage('Erro', 'Erro ao conectar com o servidor.', 'error');
+    } else {
+      alert('Erro ao conectar com o servidor.');
+    }
   }
 }
-
 // expor no escopo global p/ funcionar com onclick no HTML
 window.openEmailModal = openEmailModal;
 window.associarCuidador = associarCuidador;
