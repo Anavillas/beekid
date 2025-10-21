@@ -39,7 +39,7 @@ router.get(
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
-    res.redirect(`http://localhost:3000/dashboard?token=${token}`);
+    res.redirect(`http://localhost:3000/criancas?token=${token}`);
   }
 );
 
