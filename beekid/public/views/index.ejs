@@ -75,7 +75,7 @@ document.getElementById('loginForm').addEventListener('submit', async function (
     if (response.ok) {
       localStorage.setItem('token', data.token);
       // ✅ template string correta
-      window.location.href = `/dashboard?token=${encodeURIComponent(data.token)}`;
+      window.location.href = `/criancas?token=${encodeURIComponent(data.token)}`;
     } else {
       alert('Erro no login: ' + (data.message || 'Tente novamente.'));
     }
