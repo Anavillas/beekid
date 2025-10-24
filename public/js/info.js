@@ -8,7 +8,7 @@ async function openInfoModal(idInfo = null) {
 
   // limpa
   document.getElementById('infoIdInput').value = '';
-  document.getElementById('tipoInfoSelect').value = 'alergias';
+  document.getElementById('tipoInfoSelect').value = '';
   document.getElementById('infoDescricaoInput').value = '';
 
   if (idInfo != null && idInfo !== '') {
@@ -28,7 +28,7 @@ async function openInfoModal(idInfo = null) {
       }
 
       document.getElementById('infoIdInput').value = info.idInfo_crianca ?? '';
-      document.getElementById('tipoInfoSelect').value = info.tipo_info || 'alergias';
+      document.getElementById('tipoInfoSelect').value = info.tipo_info || '';
       document.getElementById('infoDescricaoInput').value = info.descricao || '';
 
       title.textContent = 'Editar informação';
