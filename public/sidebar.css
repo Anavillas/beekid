@@ -148,15 +148,6 @@ body > *:not(.sidebar){
   :root{ --sb-w: 220px; }
 }
 @media (max-width: 720px){
-  /* Sidebar vira “off-canvas” (escondida por padrão).
-     Se quiser abrir, adicione a classe .is-open na .sidebar com JS. */
-  .sidebar{
-    transform: translateX(calc(-1 * var(--sb-w)));
-    transition: transform .25s ease;
-  }
-  .sidebar.is-open{ transform: translateX(0); }
-
-  body > *:not(.sidebar){
-    margin-left: 0; /* conteúdo ocupa a tela toda no mobile */
-  }
+  .sidebar{ transform:none; }     /* mantém visível */
+  body > *:not(.sidebar){ margin-left: var(--sb-w); } /* opcional */
 }
