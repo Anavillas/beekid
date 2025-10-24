@@ -1,16 +1,53 @@
 // public/js/agenda.js
 
-async function openAtividadeModal(atividadeId = null) {
-  const modal = document.getElementById('atividadeModal');
-  const h2 = document.getElementById('modalAtividadeTitle');
-  const saveBtn = document.getElementById('salvarAtividadeBtn');
+// ================== HELPERS ==================
+function normalizeStatus(v) {
+  if (!v) return null;
+  const s = String(v)
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .trim().toUpperCase();
+  if (s === 'PENDENTE' || s === 'CONCLUIDO') return s;
 
-  // limpa
-  document.getElementById('horarioInput').value = '';
-  document.getElementById('tituloInput').value = '';
-  document.getElementById('descricaoInput').value = '';
-  document.getElementById('statusInput').value = 'pendente';
+  // aliases comuns -> CONCLUIDO
+  if (['CONCLUIDA','CONCLUIDOS','CONCLUIDAS','CONCLUIDO','FEITO','FEITA','DONE','FINALIZADO','FINALIZADA'].includes(s)) {
+    return 'CONCLUIDO';
+  }
+  // aliases comuns -> PENDENTE
+  if (['PEND','TODO','ABERTO','ABERTA','EM_ABERTO','EMABERTO','AGUARDANDO'].includes(s)) {
+    return 'PENDENTE';
+  }
+  return null;
+}
+
+function labelFromEnum(s) {
+  return s === 'CONCLUIDO' ? 'Concluída' : 'Pendente';
+}
+
+function statusClassFromEnum(s) {
+  return s === 'CONCLUIDO' ? 'concluida' : 'pendente';
+}
+
+// Espera-se que existam no projeto:
+// - authHeaders(): retorna { Authorization: 'Bearer ...' } quando existir
+// - showAlert(msg): exibe toast/alert
+// - closeModal(id): fecha modal
+// - idCrianca (global)
+
+// ================== ABRIR MODAL ==================
+async function openAtividadeModal(atividadeId = null) {
+  const modal  = document.getElementById('atividadeModal');
+  const h2     = document.getElementById('modalAtividadeTitle');
+  const saveBtn= document.getElementById('salvarAtividadeBtn');
+
+  // limpa campos
   document.getElementById('atividadeIdInput').value = '';
+  document.getElementById('horarioInput').value     = '';
+  document.getElementById('tituloInput').value      = '';
+  document.getElementById('descricaoInput').value   = '';
+
+  // default seguro no select (mesmo que HTML use minúsculo)
+  const statusSel = document.getElementById('statusInput');
+  if (statusSel) statusSel.value = 'PENDENTE';
 
   if (atividadeId) {
     try {
@@ -18,13 +55,15 @@ async function openAtividadeModal(atividadeId = null) {
       if (!response.ok) throw new Error('Atividade não encontrada.');
       const tarefa = await response.json();
 
-      document.getElementById('horarioInput').value   = tarefa.horario ?? tarefa.horio ?? '';
-      document.getElementById('tituloInput').value    = tarefa.titulo ?? '';
-      document.getElementById('descricaoInput').value = tarefa.descricao ?? '';
-      document.getElementById('statusInput').value    = tarefa.status_tarefa ?? 'pendente';
       document.getElementById('atividadeIdInput').value = tarefa.idAgenda;
+      document.getElementById('horarioInput').value     = tarefa.horario ?? tarefa.horio ?? '';
+      document.getElementById('tituloInput').value      = tarefa.titulo ?? '';
+      document.getElementById('descricaoInput').value   = tarefa.descricao ?? '';
 
-      h2.textContent = 'Editar Atividade';
+      const st = normalizeStatus(tarefa.status_tarefa) || 'PENDENTE';
+      if (statusSel) statusSel.value = st;
+
+      h2.textContent   = 'Editar Atividade';
       saveBtn.textContent = 'Atualizar';
     } catch (err) {
       console.error(err);
@@ -32,29 +71,36 @@ async function openAtividadeModal(atividadeId = null) {
       return;
     }
   } else {
-    h2.textContent = 'Adicionar Atividade';
-    saveBtn.textContent = 'Salvar';
+    h2.textContent       = 'Adicionar Atividade';
+    saveBtn.textContent  = 'Salvar';
   }
 
   modal.style.display = 'flex';
 }
 
+// ================== SALVAR (CREATE/UPDATE) ==================
 async function salvarAtividade() {
   try {
-    const atividadeId   = document.getElementById('atividadeIdInput').value;
-    const horario       = document.getElementById('horarioInput').value.trim();
-    const titulo        = document.getElementById('tituloInput').value.trim();
-    const descricao     = document.getElementById('descricaoInput').value.trim();
-    const status_tarefa = (document.getElementById('statusInput').value || '').toLowerCase();
+    const atividadeId = document.getElementById('atividadeIdInput').value;
+    const horario     = document.getElementById('horarioInput').value.trim();
+    const titulo      = document.getElementById('tituloInput').value.trim();
+    const descricao   = document.getElementById('descricaoInput').value.trim();
+
+    const rawStatus   = document.getElementById('statusInput').value;
+    const status_tarefa = normalizeStatus(rawStatus) || 'PENDENTE'; // default seguro
 
     if (!horario || !titulo || !descricao) {
       showAlert("Preencha todos os campos obrigatórios!");
       return;
     }
+    if (!idCrianca) {
+      showAlert("Nenhuma criança selecionada.");
+      return;
+    }
 
-    const data = { horario, titulo, descricao, status_tarefa, id_crianca: idCrianca };
+    const data   = { horario, titulo, descricao, status_tarefa, id_crianca: idCrianca };
     const method = atividadeId ? 'PUT' : 'POST';
-    const url    = atividadeId ? `/api/agenda/${atividadeId}` : '/api/agenda';
+    const url    = atividadeId ? `/api/agenda/${encodeURIComponent(atividadeId)}` : '/api/agenda';
 
     const response = await fetch(url, {
       method,
@@ -62,7 +108,10 @@ async function salvarAtividade() {
       body: JSON.stringify(data)
     });
 
-    const result = await response.json().catch(() => ({}));
+    const result = await (async () => {
+      const ct = response.headers.get('content-type') || '';
+      return ct.includes('application/json') ? await response.json().catch(() => ({})) : {};
+    })();
 
     if (!response.ok) {
       console.error('Salvar falhou:', response.status, result);
@@ -79,10 +128,12 @@ async function salvarAtividade() {
   }
 }
 
+// ================== LISTAR DO DIA ==================
 async function carregarAtividadesDoDia() {
   try {
     const response = await fetch(`/api/agenda/crianca/${idCrianca}`, { headers: { ...authHeaders() } });
     const lista = document.getElementById('listaAtividades');
+    if (!lista) return;
     lista.innerHTML = '';
 
     if (!response.ok) {
@@ -100,32 +151,29 @@ async function carregarAtividadesDoDia() {
     }
 
     atividades.forEach((tarefa) => {
-      const status = (tarefa.status_tarefa || 'pendente').toLowerCase();
-    const statusClass =
-      status.includes('concl') ? 'concluida' :
-      status.includes('cancel') ? 'cancelada' : 'pendente';
+      const stEnum = normalizeStatus(tarefa.status_tarefa) || 'PENDENTE';
+      const statusClass = statusClassFromEnum(stEnum);
 
-    const li = document.createElement('li');
-    li.className = 'task';
-    li.setAttribute('data-status', statusClass);
-    li.innerHTML = `
-      <div class="task-main">
-        <div class="task-top">
-          <span class="time">${tarefa.horario || ''}</span>
-          <span class="badge ${statusClass}">
-            ${statusClass === 'concluida' ? 'Concluída' :
-              statusClass === 'cancelada' ? 'Cancelada' : 'Pendente'}
-          </span>
+      const li = document.createElement('li');
+      li.className = 'task';
+      li.setAttribute('data-status', statusClass);
+      li.innerHTML = `
+        <div class="task-main">
+          <div class="task-top">
+            <span class="time">${tarefa.horario || ''}</span>
+            <span class="badge ${statusClass}">
+              ${labelFromEnum(stEnum)}
+            </span>
+          </div>
+          <div class="title">${tarefa.titulo || ''}</div>
+          <p class="desc">${tarefa.descricao ?? ''}</p>
         </div>
-        <div class="title">${tarefa.titulo || ''}</div>
-        <p class="desc">${tarefa.descricao ?? ''}</p>
-      </div>
-      <div class="atividade-actions">
-        <button onclick="openAtividadeModal(${tarefa.idAgenda})">Editar</button>
-        <button onclick="deletarAtividade(${tarefa.idAgenda})">Excluir</button>
-      </div>
-    `;
-lista.appendChild(li);
+        <div class="atividade-actions">
+          <button type="button" onclick="openAtividadeModal(${tarefa.idAgenda})">Editar</button>
+          <button type="button" onclick="deletarAtividade(${tarefa.idAgenda})">Excluir</button>
+        </div>
+      `;
+      lista.appendChild(li);
     });
   } catch (err) {
     console.error('Erro ao carregar atividades:', err);
@@ -133,6 +181,7 @@ lista.appendChild(li);
   }
 }
 
+// ================== EXCLUIR ==================
 async function askConfirm(message, opts = {}) {
   if (typeof showConfirm === 'function') {
     try {
@@ -141,14 +190,13 @@ async function askConfirm(message, opts = {}) {
         message,
         confirmText: opts.confirmText || 'Confirmar',
         cancelText: opts.cancelText || 'Cancelar',
-        variant: opts.variant || 'danger', // usa o estilo "perigoso" para exclusão
+        variant: opts.variant || 'danger',
       });
       return !!ok;
     } catch (_) {
       return false;
     }
   }
-  // fallback se o modal não estiver carregado
   return window.confirm(message);
 }
 
@@ -160,11 +208,15 @@ async function deletarAtividade(id) {
   if (!ok) return;
 
   try {
-    const response = await fetch(`/api/agenda/${id}`, {
+    const response = await fetch(`/api/agenda/${encodeURIComponent(id)}`, {
       method: 'DELETE',
       headers: { ...authHeaders() }
     });
-    const result = await response.json().catch(() => ({}));
+    const result = await (async () => {
+      const ct = response.headers.get('content-type') || '';
+      return ct.includes('application/json') ? await response.json().catch(() => ({})) : {};
+    })();
+
     if (!response.ok) {
       showAlert(result?.message || result?.error || 'Erro ao excluir a atividade.');
       return;
@@ -177,13 +229,12 @@ async function deletarAtividade(id) {
   }
 }
 
-// expor pro HTML (onclick)
-window.openAtividadeModal = openAtividadeModal;
-window.salvarAtividade = salvarAtividade;
+// ================== EXPOSE / INIT ==================
+window.openAtividadeModal      = openAtividadeModal;
+window.salvarAtividade         = salvarAtividade;
 window.carregarAtividadesDoDia = carregarAtividadesDoDia;
-window.deletarAtividade = deletarAtividade;
+window.deletarAtividade        = deletarAtividade;
 
-// init local
 document.addEventListener('DOMContentLoaded', () => {
   const btn = document.getElementById('salvarAtividadeBtn');
   if (btn) btn.addEventListener('click', salvarAtividade);

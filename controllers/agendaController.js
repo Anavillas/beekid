@@ -1,18 +1,25 @@
-// controllers/agendaController.js
 const { Agenda, Crianca } = require('../models');
+
+const MAP_STATUS = {
+  PENDENTE: 'PENDENTE', CONCLUIDO: 'CONCLUIDO',
+  CONCLUÍDO: 'CONCLUIDO', CONCLUIDA: 'CONCLUIDO', FEITO: 'CONCLUIDO', DONE: 'CONCLUIDO',
+  PEND: 'PENDENTE', TODO: 'PENDENTE', ABERTO: 'PENDENTE', ABERTA: 'PENDENTE'
+};
+function normStatus(v) {
+  if (!v) return null;
+  const s = String(v).normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toUpperCase();
+  return MAP_STATUS[s] || (s === 'PENDENTE' || s === 'CONCLUIDO' ? s : null);
+}
 
 module.exports = {
   async create(req, res) {
     try {
       let { horario, titulo, titulo_tarefa, descricao, status_tarefa, id_crianca } = req.body;
-
-      // compat: se vier titulo_tarefa do cliente antigo
       if (!titulo && titulo_tarefa) titulo = titulo_tarefa;
 
-      // normaliza status
-      if (status_tarefa) status_tarefa = String(status_tarefa).toLowerCase();
+      const status = normStatus(status_tarefa) || 'PENDENTE'; // default seguro
 
-      const novaTarefa = await Agenda.create({ horario, titulo, descricao, status_tarefa, id_crianca });
+      const novaTarefa = await Agenda.create({ horario, titulo, descricao, status_tarefa: status, id_crianca });
       return res.status(201).json(novaTarefa);
     } catch (err) {
       console.error(err);
@@ -63,13 +70,13 @@ module.exports = {
     let { horario, titulo, titulo_tarefa, descricao, status_tarefa } = req.body;
 
     if (!titulo && titulo_tarefa) titulo = titulo_tarefa;
-    if (status_tarefa) status_tarefa = String(status_tarefa).toLowerCase();
+    const status = status_tarefa ? normStatus(status_tarefa) : undefined;
+
+    const data = { horario, titulo, descricao };
+    if (status) data.status_tarefa = status;
 
     try {
-      const [updated] = await Agenda.update(
-        { horario, titulo, descricao, status_tarefa },
-        { where: { idAgenda } }
-      );
+      const [updated] = await Agenda.update(data, { where: { idAgenda } });
       if (updated === 0) return res.status(404).json({ error: "Tarefa não encontrada." });
       return res.json({ message: "Tarefa atualizada com sucesso." });
     } catch (err) {
