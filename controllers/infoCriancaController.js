@@ -6,37 +6,49 @@ const MAP_TIPO = {
   alergias: 'alergias',
   saude: 'medicamento',
   medicamento: 'medicamento',
-  escola: 'outros',   // ajuste aqui se adicionar ENUM 'escola' no modelo
+  remedio: 'medicamento',
   outros: 'outros'
 };
+
 function normTipo(v) {
   if (!v) return null;
-  const val = String(v).trim().toLowerCase();
-  const map = {
-    alergia: 'alergias',       // usuário pode mandar singular
-    alergias: 'alergias',
-    saude: 'medicamento',      // caso usuário mande 'saude'
-    medicamento: 'medicamento',
-    remedio: 'medicamento',    // caso mande isso
-    outros: 'outros'
-  };
-  return map[val] || null;
+  const key = String(v).trim().toLowerCase();
+  return MAP_TIPO[key] || null;
 }
 
 module.exports = {
   async create(req, res) {
-    try {
-      const { tipo_info, descricao, id_crianca } = req.body;
-      const tipo = normTipo(tipo_info);
-      if (!tipo) return res.status(400).json({ error: "tipo_info inválido" });
+  try {
+    console.log("📩 Recebido no backend (req.body):", req.body);
 
-      const novaInfo = await InfoCrianca.create({ tipo_info: tipo, descricao, id_crianca });
-      return res.status(201).json(novaInfo);
-    } catch (err) {
-      console.error(err);
-      return res.status(500).json({ error: "Erro ao criar informação da criança", details: err?.message });
+    let { tipo_info, descricao, id_crianca } = req.body;
+
+    // Normaliza e valida o tipo_info
+    const tipo = normTipo(tipo_info);
+    if (!tipo) {
+      console.log("❌ tipo_info inválido recebido:", tipo_info);
+      return res.status(400).json({ error: `tipo_info inválido: ${tipo_info}` });
     }
-  },
+
+    // Criar registro
+    const novaInfo = await InfoCrianca.create({
+      tipo_info: tipo,
+      descricao,
+      id_crianca
+    });
+
+    console.log("✅ Informação criada com sucesso:", novaInfo);
+    return res.status(201).json(novaInfo);
+
+  } catch (err) {
+    console.error("🔥 Erro no create info:", err);
+    return res.status(500).json({
+      error: "Erro ao criar informação da criança",
+      details: err?.message
+    });
+  }
+}
+,
 
   async getAll(req, res) {
     try {
