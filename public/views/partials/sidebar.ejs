@@ -1,4 +1,13 @@
-<div class="sidebar">
+<!-- Botão de abrir sidebar (hambúrguer) -->
+<button class="sb-toggle" aria-expanded="false" aria-controls="sidebar">
+  <i class="fa-solid fa-bars"></i>
+</button>
+
+<!-- Backdrop (fundo escuro para mobile) -->
+<div class="sb-backdrop" hidden></div>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
   <div class="profile">
     <p id="profileName"><%= nomeUsuario %></p>
     <p id="profileCPF"><%= cpfUsuario %></p>
@@ -10,3 +19,19 @@
     <a href="/logout"><i class="fa-solid fa-right-from-bracket"></i> Sair</a>
   </nav>
 </div>
+
+<script>
+const btn = document.querySelector('.sb-toggle');
+const sb  = document.querySelector('.sidebar');
+const bd  = document.querySelector('.sb-backdrop');
+
+function openSB(open){
+  sb.classList.toggle('is-open', open);
+  bd.hidden = !open;
+  document.body.classList.toggle('no-scroll', open);
+  btn.setAttribute('aria-expanded', open);
+}
+
+btn.addEventListener('click', () => openSB(!sb.classList.contains('is-open')));
+bd.addEventListener('click', () => openSB(false));
+</script>

@@ -4,9 +4,6 @@
 :root{
   --sb-w: 240px;
   --roxo: #351C75;
-  --roxo-050:#efe9fa;
-  --roxo-200:#d8ccf4;
-  --roxo-600:#2b165f;
   --amarelo:#FFB33A;
   --rosa:#ea698b;
 
@@ -14,140 +11,133 @@
   --text-muted:#dcd7f4;
   --bd: rgba(255,255,255,.18);
 }
+@media (max-width: 900px){
+  :root{ --sb-w: 220px; }
+}
+
+/* ============================= */
+/* BASE / RESET RÁPIDO           */
+/* ============================= */
+*{ box-sizing: border-box; }
+html,body{ height:100%; }
+body{ margin:0; background:#f4f4f8; color:#222; font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+body.no-scroll{ overflow:hidden; }
+
+@media (prefers-reduced-motion: reduce){
+  *{ transition:none !important; animation:none !important; }
+}
+
+/* ============================= */
+/* BOTÃO & BACKDROP (MOBILE)     */
+/* ============================= */
+.sb-toggle{
+  position: fixed; top: 14px; left: 14px;
+  background: var(--roxo); color:#fff; border:0;
+  padding:10px 12px; border-radius:10px; cursor:pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,.25);
+  z-index: 50; display:none; /* só mobile */
+}
+.sb-backdrop{
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.40);
+  backdrop-filter: blur(2px);
+  z-index: 39;
+}
 
 /* ============================= */
 /* SIDEBAR                       */
 /* ============================= */
 .sidebar{
-  position: fixed;
-  inset: 0 auto 0 0;
+  position: fixed; inset: 0 auto 0 0;
   width: var(--sb-w);
   background: linear-gradient(180deg, var(--roxo), #5c2ac7);
   color: var(--text);
-  padding: 18px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
+  padding: calc(18px + env(safe-area-inset-top,0)) 16px 18px 16px;
+  display: flex; flex-direction: column; gap: 18px;
   box-shadow: 0 10px 30px rgba(53,28,117,.35);
   z-index: 40;
+  transform: translateX(0);
+  transition: transform .25s ease;
 }
-.sidebar::after{ /* brilho sutil na borda */
-  content:"";
-  position:absolute; right:-1px; top:0; bottom:0; width:1px;
+.sidebar::after{
+  content:""; position:absolute; right:-1px; top:0; bottom:0; width:1px;
   background: linear-gradient(180deg, rgba(255,255,255,.35), rgba(255,255,255,0));
   opacity:.6;
 }
 
-/* Perfil (nome + cpf) */
+/* Perfil */
 .sidebar .profile{
-  text-align: left;
-  margin-bottom: 6px;
-  padding: 12px;
-  border: 1px solid var(--bd);
-  border-radius: 14px;
+  text-align: left; margin-bottom: 6px; padding: 12px;
+  border: 1px solid var(--bd); border-radius: 14px;
   background: rgba(255,255,255,.06);
   box-shadow: 0 6px 18px rgba(0,0,0,.12) inset;
 }
 #profileName{
-  margin:0 0 2px;
-  font-weight: 900;
-  letter-spacing: .2px;
-  font-size: 16px;
-  color:#ffffff;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  margin:0 0 2px; font-weight: 900; letter-spacing:.2px;
+  font-size: 16px; color:#fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-#profileCPF{
-  margin:0;
-  color: var(--text-muted);
-  font-size: 13px;
-}
+#profileCPF{ margin:0; color: var(--text-muted); font-size:13px; }
 
 /* Navegação */
-/* Links padrão */
-.sidebar nav a {
+.sidebar nav a{
   --pad: 10px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  text-decoration: none;
-  color: #f9f9ff;               /* letras brancas */
-  font-weight: 600;
-  padding: var(--pad) 12px;
-  border-radius: 12px;
+  display: flex; align-items: center; gap: 12px;
+  text-decoration: none; color: #f9f9ff; font-weight: 600;
+  padding: var(--pad) 12px; border-radius: 12px;
   border: 1px solid transparent;
   transition: background .18s ease, color .18s ease;
+  position: relative; /* para o ::before do ativo */
 }
-
-/* Ícones */
-.sidebar nav a i {
-  width: 18px;
-  text-align: center;
-  font-size: 1rem;
-  color: #f9f9ff;              /* ícones brancos */
+.sidebar nav a i{
+  width: 18px; text-align: center; font-size: 1rem; color:#f9f9ff;
   transition: color .18s ease;
 }
-
-/* Hover */
-.sidebar nav a:hover {
+.sidebar nav a:hover{
   background: rgba(255,255,255,.15);
   border-color: rgba(255,255,255,.25);
   color: var(--amarelo);
 }
-.sidebar nav a:hover i {
-  color: var(--amarelo);
-}
-
+.sidebar nav a:hover i{ color: var(--amarelo); }
 .sidebar nav a:focus-visible{
-  outline: 3px solid rgba(234,105,139,.45); /* rosa da identidade */
-  outline-offset: 2px;
+  outline: 3px solid rgba(234,105,139,.45); outline-offset: 2px;
 }
 
-/* Estado ativo (adicione .active no link atual via servidor) */
-.sidebar nav a.active {
+/* Ativo */
+.sidebar nav a.active{
   background: rgba(255,255,255,.20);
   border-color: rgba(255,255,255,.35);
   color: var(--amarelo);
 }
-.sidebar nav a.active i {
-  color: var(--amarelo);
-}
+.sidebar nav a.active i{ color: var(--amarelo); }
 .sidebar nav a.active::before{
-  content:"";
-  position:absolute; left:-16px; top:8px; bottom:8px; width:4px;
+  content:""; position:absolute; left:-12px; top:8px; bottom:8px; width:4px;
   background: linear-gradient(180deg, var(--amarelo), #ffd680);
   border-radius: 4px;
 }
 
-.sidebar nav a[href*="logout"] {
-  background: rgba(234,105,139,.16);
-  border-color: rgba(234,105,139,.35);
+/* Sair */
+.sidebar nav a[href*="logout"]{
+  background: rgba(234,105,139,.16); border-color: rgba(234,105,139,.35);
 }
-.sidebar nav a[href*="logout"]:hover {
-  background: rgba(234,105,139,.25);
-  color: #fff;
-}
-.sidebar nav a[href*="logout"] i {
-  color: #ea698b;
-}
-.sidebar nav a[href*="logout"]:hover i {
-  color: #fff;
-}
+.sidebar nav a[href*="logout"]:hover{ background: rgba(234,105,139,.25); color:#fff; }
+.sidebar nav a[href*="logout"] i{ color: var(--rosa); }
+.sidebar nav a[href*="logout"]:hover i{ color:#fff; }
 
 /* ============================= */
-/* CONTEÚDO AO LADO              */
+/* CONTEÚDO AO LADO (DESKTOP)    */
 /* ============================= */
-body > *:not(.sidebar){
+body > *:not(.sidebar):not(.sb-toggle):not(.sb-backdrop){
   margin-left: var(--sb-w);
-  transition: margin-left .2s ease;
+  padding: 20px;
+  transition: margin-left .25s ease;
 }
 
 /* ============================= */
-/* RESPONSIVO                    */
+/* MOBILE: OFF-CANVAS            */
 /* ============================= */
-@media (max-width: 900px){
-  :root{ --sb-w: 220px; }
-}
 @media (max-width: 720px){
-  .sidebar{ transform:none; }     /* mantém visível */
-  body > *:not(.sidebar){ margin-left: var(--sb-w); } /* opcional */
+  .sb-toggle{ display:block; }
+  .sidebar{ transform: translateX(calc(-1 * var(--sb-w))); }
+  .sidebar.is-open{ transform: translateX(0); }
+  body > *:not(.sidebar):not(.sb-toggle):not(.sb-backdrop){ margin-left: 0; }
 }
