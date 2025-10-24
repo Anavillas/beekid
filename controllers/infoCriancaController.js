@@ -1,20 +1,32 @@
 // controllers/infoCriancaController.js
 const { InfoCrianca, Crianca } = require('../models');
 
+// Substitua o MAP_TIPO por:
 const MAP_TIPO = {
-  alergia: 'alergias',
-  alergias: 'alergias',
-  saude: 'medicamento',
-  medicamento: 'medicamento',
-  remedio: 'medicamento',
-  outros: 'outros'
+  alergia: 'ALERGIA',
+  alergias: 'ALERGIA',
+  saude: 'SAUDE',
+  saúde: 'SAUDE',
+  medicamento: 'SAUDE',
+  remedio: 'SAUDE',
+  remédio: 'SAUDE',
+  escola: 'ESCOLA',
+  outros: 'OUTROS',
+  outro: 'OUTROS',
+  // aceita já em ENUM:
+  ALERGIA: 'ALERGIA',
+  SAUDE: 'SAUDE',
+  ESCOLA: 'ESCOLA',
+  OUTROS: 'OUTROS'
 };
 
 function normTipo(v) {
   if (!v) return null;
-  const key = String(v).trim().toLowerCase();
-  return MAP_TIPO[key] || null;
+  const key = String(v).normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+  const low = key.toLowerCase();
+  return MAP_TIPO[key] || MAP_TIPO[low] || null;
 }
+
 
 module.exports = {
   async create(req, res) {

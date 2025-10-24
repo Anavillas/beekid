@@ -2,30 +2,54 @@
 
 // ================== CONFIG ==================
 const INFO_BASE = '/api/info';
-// Funções utilitárias esperadas no projeto:
-// - authHeaders(): retorna { Authorization: 'Bearer ...' } quando existir
-// - showAlert(msg): exibe alert/toast
-// - closeModal(id): fecha modal
-// - idCrianca: variável global com o ID da criança atual
+// Utilitários esperados no projeto:
+// - authHeaders()
+// - showAlert(msg)
+// - closeModal(id)
+// - idCrianca (global)
 
-// Valores aceitos pelo ENUM no banco:
-const ENUM_TIPOS = ['alergias', 'medicamento', 'outros'];
+// ENUM exato do banco:
+const ENUM_TIPOS = ['ALERGIA', 'SAUDE', 'ESCOLA', 'OUTROS'];
 
-// (Opcional) Normalizador simples no front — mantém só valores válidos
+// Remove acentos e normaliza
+function normStr(s) {
+  return String(s || '')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .trim().toLowerCase();
+}
+
+// Converte qualquer entrada do front/BD para um dos 4 valores do banco
 function normalizeTipoFront(v) {
-  if (!v) return null;
-  const s = String(v).trim().toLowerCase();
-  // mapeia alguns aliases comuns do front para o enum exato
+  const s = normStr(v);
   const map = {
-    alergia: 'alergias',
-    alergias: 'alergias',
-    saude: 'medicamento',
-    remedio: 'medicamento',
-    medicamento: 'medicamento',
-    outros: 'outros'
+    alergia: 'ALERGIA',
+    alergias: 'ALERGIA',
+    saude: 'SAUDE',
+    saude_: 'SAUDE',
+    saude1: 'SAUDE',
+    remedio: 'SAUDE',
+    remedios: 'SAUDE',
+    medicamento: 'SAUDE',
+    escola: 'ESCOLA',
+    school: 'ESCOLA',
+    outros: 'OUTROS',
+    outro: 'OUTROS'
   };
-  const normalized = map[s] || null;
-  return ENUM_TIPOS.includes(normalized) ? normalized : null;
+  // tenta direto ENUM
+  const maybeEnum = s.toUpperCase();
+  if (ENUM_TIPOS.includes(maybeEnum)) return maybeEnum;
+  // mapeia alias
+  return map[s] || null;
+}
+
+function enumToLabel(v) {
+  switch (normalizeTipoFront(v)) {
+    case 'ALERGIA': return 'Alergia';
+    case 'SAUDE':   return 'Saúde';
+    case 'ESCOLA':  return 'Escola';
+    case 'OUTROS':  return 'Outros';
+    default:        return v || '';
+  }
 }
 
 // ================== MODAL ==================
@@ -36,12 +60,17 @@ async function openInfoModal(idInfo = null) {
 
   // limpa campos
   document.getElementById('infoIdInput').value = '';
-  document.getElementById('tipoInfoSelect').value = 'alergias'; // default válido
+
+  // Se o seu HTML do <select> ainda usa values minúsculos (ex.: "alergias"),
+  // deixamos como está; ao salvar, convertemos para o ENUM do banco.
+  // Para um default seguro, tenta selecionar a primeira opção disponível.
+  const tipoSel = document.getElementById('tipoInfoSelect');
+  if (tipoSel && tipoSel.options.length) tipoSel.selectedIndex = 0;
+
   document.getElementById('infoDescricaoInput').value = '';
 
   if (idInfo != null && idInfo !== '') {
     try {
-      // Busca todas as infos da criança e filtra pelo id (já que GET /:id pode não existir)
       const listResp = await fetch(`${INFO_BASE}/crianca/${idCrianca}`, { headers: { ...authHeaders() } });
       if (!listResp.ok) throw new Error('Falha ao carregar informações da criança.');
       const infos = await listResp.json();
@@ -55,12 +84,21 @@ async function openInfoModal(idInfo = null) {
         return;
       }
 
-      // Garante que o tipo lido do backend é um dos três válidos
-      const tipoOk = normalizeTipoFront(info.tipo_info) || 'outros';
-
       document.getElementById('infoIdInput').value = info.idInfo_crianca ?? '';
-      document.getElementById('tipoInfoSelect').value = tipoOk;
       document.getElementById('infoDescricaoInput').value = info.descricao || '';
+
+      // Tentar posicionar o <select> no valor equivalente, mesmo se HTML usar minúsculas
+      const atualEnum = normalizeTipoFront(info.tipo_info); // -> ALERGIA|SAUDE|ESCOLA|OUTROS
+      if (tipoSel && atualEnum) {
+        // Procura uma option cujo value normalizado aponte para o mesmo ENUM
+        for (let i = 0; i < tipoSel.options.length; i++) {
+          const candidate = normalizeTipoFront(tipoSel.options[i].value);
+          if (candidate === atualEnum) {
+            tipoSel.selectedIndex = i;
+            break;
+          }
+        }
+      }
 
       title.textContent = 'Editar informação';
       btn.textContent   = 'Atualizar';
@@ -86,12 +124,12 @@ async function salvarInfo() {
   if (btn) btn.disabled = true;
 
   try {
-    const idInfo     = document.getElementById('infoIdInput').value;
-    const tipoRaw    = document.getElementById('tipoInfoSelect').value;
-    const tipo_info  = normalizeTipoFront(tipoRaw); // garante ENUM válido
-    const descricao  = document.getElementById('infoDescricaoInput').value.trim();
+    const idInfo    = document.getElementById('infoIdInput').value;
+    const tipoRaw   = document.getElementById('tipoInfoSelect').value; // pode ser minúsculo no HTML
+    const tipoEnum  = normalizeTipoFront(tipoRaw); // -> ALERGIA|SAUDE|ESCOLA|OUTROS
+    const descricao = document.getElementById('infoDescricaoInput').value.trim();
 
-    if (!tipo_info) {
+    if (!tipoEnum) {
       showAlert('Selecione um tipo válido.');
       return;
     }
@@ -104,50 +142,37 @@ async function salvarInfo() {
       return;
     }
 
-    const payloadBase = { tipo_info, descricao, id_crianca: idCrianca };
+    // IMPORTANTE: o backend atual reescreve o tipo para valores inválidos.
+    // Assim, para funcionar você PRECISA aplicar o patch no controller (abaixo).
+    const payloadBase = { tipo_info: tipoEnum, descricao, id_crianca: idCrianca };
 
     let resp, data;
 
     if (idInfo) {
-      // PUT /api/info/:idInfo_crianca (conforme seu controller)
       const urlPut = `${INFO_BASE}/${encodeURIComponent(idInfo)}`;
       resp = await fetch(urlPut, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', ...authHeaders() },
         body: JSON.stringify(payloadBase),
       });
-
-      // Lê resposta (JSON se houver)
-      const ct = resp.headers.get('content-type') || '';
-      data = ct.includes('application/json') ? await resp.json().catch(() => ({})) : {};
-
-      if (!resp.ok) {
-        console.error('Salvar info falhou (update):', resp.status, data);
-        showAlert(data?.message || data?.error || 'Erro ao salvar informação.');
-        return;
-      }
-
-      showAlert('Informação atualizada!');
     } else {
-      // POST /api/info
       resp = await fetch(INFO_BASE, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...authHeaders() },
         body: JSON.stringify(payloadBase),
       });
-
-      const ct = resp.headers.get('content-type') || '';
-      data = ct.includes('application/json') ? await resp.json().catch(() => ({})) : {};
-
-      if (!resp.ok) {
-        console.error('Salvar info falhou (create):', resp.status, data);
-        showAlert(data?.message || data?.error || 'Erro ao salvar informação.');
-        return;
-      }
-
-      showAlert('Informação adicionada!');
     }
 
+    const ct = resp.headers.get('content-type') || '';
+    data = ct.includes('application/json') ? await resp.json().catch(() => ({})) : {};
+
+    if (!resp.ok) {
+      console.error('Salvar info falhou:', resp.status, data);
+      showAlert(data?.message || data?.error || 'Erro ao salvar informação.');
+      return;
+    }
+
+    showAlert(idInfo ? 'Informação atualizada!' : 'Informação adicionada!');
     closeModal('infoModal');
     carregarInfos();
   } catch (e) {
@@ -182,11 +207,11 @@ async function carregarInfos() {
     }
 
     infos.forEach(info => {
-      const tipoOk = normalizeTipoFront(info.tipo_info) || info.tipo_info || 'outros';
+      const tipoEnum = normalizeTipoFront(info.tipo_info) || 'OUTROS';
       const li = document.createElement('li');
       li.innerHTML = `
         <div class="info-item">
-          <strong>[${tipoOk}]</strong>
+          <strong>[${enumToLabel(tipoEnum)}]</strong>
           <p>${info.descricao ? String(info.descricao).replace(/</g, "&lt;").replace(/>/g, "&gt;") : ''}</p>
         </div>
         <div class="info-actions">
