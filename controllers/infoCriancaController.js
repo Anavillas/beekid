@@ -11,36 +11,50 @@ const MAP_TIPO = {
 };
 function normTipo(v) {
   if (!v) return null;
-  const k = String(v).toLowerCase();
-  return MAP_TIPO[k] || null;
+  const val = String(v).trim().toLowerCase();
+  const map = {
+    alergia: 'alergias',       // usuário pode mandar singular
+    alergias: 'alergias',
+    saude: 'medicamento',      // caso usuário mande 'saude'
+    medicamento: 'medicamento',
+    remedio: 'medicamento',    // caso mande isso
+    outros: 'outros'
+  };
+  return map[val] || null;
 }
 
 module.exports = {
   async create(req, res) {
-    try {
-      const { tipo_info, descricao, id_crianca } = req.body;
-      const tipo = normTipo(tipo_info);
-      if (!tipo) return res.status(400).json({ error: "tipo_info inválido" });
+  try {
+    console.log("📩 Recebido no backend (req.body):", req.body);
 
-      const novaInfo = await InfoCrianca.create({ tipo_info: tipo, descricao, id_crianca });
-      return res.status(201).json(novaInfo);
-    } catch (err) {
-      console.error(err);
-      return res.status(500).json({ error: "Erro ao criar informação da criança", details: err?.message });
+    let { tipo_info, descricao, id_crianca } = req.body;
+
+    // Normaliza e valida o tipo_info
+    const tipo = normTipo(tipo_info);
+    if (!tipo) {
+      console.log("❌ tipo_info inválido recebido:", tipo_info);
+      return res.status(400).json({ error: `tipo_info inválido: ${tipo_info}` });
     }
-  },
 
-  async getAll(req, res) {
-    try {
-      const infos = await InfoCrianca.findAll({
-        include: [{ model: Crianca, as: 'crianca', attributes: ['nome'] }]
-      });
-      return res.json(infos);
-    } catch (err) {
-      return res.status(500).json({ error: "Erro ao buscar informações", details: err?.message });
-    }
-  },
+    // Criar registro
+    const novaInfo = await InfoCrianca.create({
+      tipo_info: tipo,
+      descricao,
+      id_crianca
+    });
 
+    console.log("✅ Informação criada com sucesso:", novaInfo);
+    return res.status(201).json(novaInfo);
+
+  } catch (err) {
+    console.error("🔥 Erro no create info:", err);
+    return res.status(500).json({
+      error: "Erro ao criar informação da criança",
+      details: err?.message
+    });
+  }
+},
   async getByCrianca(req, res) {
     const { id_crianca } = req.params;
     try {
